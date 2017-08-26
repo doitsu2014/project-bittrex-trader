@@ -1,0 +1,21 @@
+{
+  "name": "doitsubitcoinstool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "config": "^1.26.2",
+    "express": "^4.15.4",
+    "morgan": "^1.8.2",
+    "node": "^8.3.0",
+    "node.bittrex.api": "^0.4.4",
+    "path": "^0.12.7"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
