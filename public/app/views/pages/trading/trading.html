@@ -1,0 +1,10 @@
+<div class="jumbotron">
+	<h1 class="display-3">Trading Area USDT-</h1>
+</div>
+
+<div class="col-md-2">
+	<b>Select your market:</b>
+	<select name="" id="ddlMarketName" class="form-control col-md-3" required="required" >
+		<option ng-repeat="market in trade.Markets" value="{{market.MarketName}}">{{market.MarketName}}</option>
+	</select>
+</div>

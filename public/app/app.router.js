@@ -6,7 +6,11 @@ angular.module('app.routes', ['ngRoute'])
         controller: 'HomeController',
         controllerAs: 'home'
       })
-
+      .when('/trading', {
+      	templateUrl: 'app/views/pages/trading/trading.html',
+      	controller: 'TradeController',
+      	controllerAs: 'trade'
+      })
     $locationProvider.html5Mode(true);
   })
 ;

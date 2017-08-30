@@ -1,12 +1,11 @@
 angular.module('homeService', [])
 	.factory('HomeService', function($http, $q) {
 		var homeFactory = {};
-
-		homeFactory.getMarketNames = function() {
-			return $http.get('/marketNames')
-				.then(function (data) {
-					console.log(data);
-					return data;
+		
+		homeFactory.getMarkets = function(reqMarketType) {
+			return $http.post('api/markets', {marketType: reqMarketType})
+				.then(function (response) {
+					return response.data.markets;
 				})
 				.catch(error => console.log(`HomeService-getMarketName________ERROR: ${error}`));
 		};

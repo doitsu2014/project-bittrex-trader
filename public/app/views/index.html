@@ -17,6 +17,8 @@
 
 		<script src="app/controllers/homeController.js"></script>
 		<script src="app/services/homeService.js"></script>
+		<script src="app/controllers/tradeController.js"></script>
+		<script src="app/services/tradeService.js"></script>
 		<script src="app/app.router.js"></script>
 		<script src="app/app.js"></script>
 	</head>
@@ -27,13 +29,14 @@
 				<div class="collapse navbar-collapse navbar-ex1-collapse">
 					<ul class="nav navbar-nav">
 						<li><a href="/">Home</a></li>
+						<li><a href="/trading">Trade Area</a></li>
 						<li><a href="/aboutme">About me</a></li>
 					</ul>
 				</div><!-- /.navbar-collapse -->
 			</div>
 		</nav>
-		<div class="container">
-			<div ng-view>
+		<div class="container col-md-12">
+			<div class="col-md-12" ng-view>
 				
 			</div>
 		</div>

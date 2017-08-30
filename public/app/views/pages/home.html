@@ -1,9 +1,38 @@
-		<div class="jumbotron">
-			<h1 class="display-3">{{ home.MarketNames }}</h1>
-			<p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-			<hr class="m-y-md">
-			<p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-			<p class="lead">
-				<a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
-			</p>
-		</div>
+<div class="jumbotron">
+	<h1 class="display-3">BTC Markets status at Bittrex</h1>
+</div>
+<div class="col-md-2">
+	<b>Select your market type:</b>
+	<select name="" ng-init="home.marketType='USDT-'" ng-model="home.marketType" ng-change="home.updateMarkets()" id="ddlMarketType" class="form-control col-md-3" required="required" >
+		<option value="USDT-">USD</option>
+		<option value="BTC-">BTC</option>
+		<option value="ETH-">ETH</option>
+	</select>
+</div>
+	
+<div class="col-md-8">
+	<table class="table table-striped table-hover col-md-12">
+		<thead>
+			<tr>
+				<th>Market Name</th>
+				<th>High</th>
+				<th>Low</th>
+				<th>Volume</th>
+				<th>Last</th>
+				<th>Base Volume</th>
+				<th>Time Stamp</th>
+			</tr>
+		</thead>
+			<tbody>
+				<tr ng-repeat="market in home.Markets">
+					<td>{{ market.MarketName }}</td>
+					<td>{{ market.High }}</td>
+					<td>{{ market.Low }}</td>
+					<td>{{ market.Volume }}</td>
+					<td>{{ market.Last }}</td>
+					<td>{{ market.BaseVolume }}</td>
+					<td>{{ market.TimeStamp }}</td>
+				</tr>
+			</tbody>
+	</table>
+</div>
