@@ -4,7 +4,49 @@
 
 <div class="col-md-2">
 	<b>Select your market:</b>
-	<select name="" id="ddlMarketName" class="form-control col-md-3" required="required" >
-		<option ng-repeat="market in trade.Markets" value="{{market.MarketName}}">{{market.MarketName}}</option>
+	<select name="" id="ddlMarketName" class="form-control col-md-3" ng-init="trade.marketName='Please choice'" ng-model="trade.marketName" required="required" >
+			<option value="{{trade.marketName}}">{{trade.marketName}}</option>
+			<option ng-repeat="market in trade.Markets" value="{{market.MarketName}}">{{market.MarketName}}</option>
 	</select>
+</div>
+<div class="col-md-4">
+	<form ng-submit="trade.buyLimit()" id="formBuyLimit" class="form-group">
+		<div class="form-group">
+			<label for="marketName">Market Name: </label>
+			<p id="marketName">{{ trade.marketName }}</p>		
+		</div>
+		<div class="form-group">
+			<label for="quantity">Quantity: </label>
+			<input type="text" ng-model="trade.quantity" id="quantity" class="form-control">
+		</div>
+		<div class="form-group">
+			<label for="quantity">Rate: </label>		
+			<input type="text" ng-model="trade.rate" id="rate" class="form-control">
+		</div>
+		<div ng-if="trade.warning" class="alert alert-warning">
+			<strong>Warning!</strong> {{trade.warning}}
+		</div>	  
+		<button type="submit" class="btn btn-default" style="width: 20%">Buy</button>
+	</form>
+</div>
+
+<div class="col-md-4">
+	<form ng-submit="trade.sellLimit()" id="formSellLimit" class="form-group">
+		<div class="form-group">
+			<label for="marketName">Market Name: </label>
+			<p id="marketName">{{ trade.marketName }}</p>		
+		</div>
+		<div class="form-group">
+			<label for="quantity">Quantity: </label>
+			<input type="text" ng-model="trade.quantity" id="quantity" class="form-control">
+		</div>
+		<div class="form-group">
+			<label for="quantity">Rate: </label>		
+			<input type="text" ng-model="trade.rate" id="rate" class="form-control">
+		</div>
+		<div ng-if="trade.warning" class="alert alert-warning">
+			<strong>Warning!</strong> {{trade.warning}}
+		</div>	  
+		<button type="submit" class="btn btn-default" style="width: 20%">Sell</button>
+	</form>
 </div>
