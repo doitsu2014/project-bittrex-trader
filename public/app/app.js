@@ -1,8 +1,13 @@
 angular.module('userApp', [
-  'ngAnimate',
-  'homeService',
-  'homeCtrl',
-  'tradeService',
-  'tradeCtrl',
-  'app.routes'
- ]);
+    'ngAnimate',
+    'authService',
+    'mainCtrl',
+    'homeService',
+    'homeCtrl',
+    'tradeService',
+    'tradeCtrl',
+    'app.routes'
+  ])
+  .config(function ($httpProvider) {
+    $httpProvider.interceptors.push('AuthInterceptor');
+  });

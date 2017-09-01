@@ -7,6 +7,7 @@
     "body-parser": "^1.17.2",
     "config": "^1.26.2",
     "express": "^4.15.4",
+    "jsonwebtoken": "^7.4.3",
     "morgan": "^1.8.2",
     "node": "^8.3.0",
     "node.bittrex.api": "^0.4.4",

@@ -12,9 +12,9 @@ angular.module('tradeCtrl', ['tradeService'])
 			TradeService.buyLimit(vm.marketName, vm.quantity, vm.rate)
 				.then(function (data) {
 					if (!data.data.success) {
-						vm.warning = data.data.message;
+						vm.warningBuy = data.data.message;
 					} else {
-						vm.warning = false;
+						vm.warningBuy = false;
 					}
 					$location.path('/trading');
 					return data;
@@ -26,9 +26,9 @@ angular.module('tradeCtrl', ['tradeService'])
 			TradeService.sellLimit(vm.marketName, vm.quantity, vm.rate)
 				.then(function (data) {
 					if (!data.data.success) {
-						vm.warning = data.data.message;
+						vm.warningSell = data.data.message;
 					} else {
-						vm.warning = false;
+						vm.warningSell = false;
 					}
 					$location.path('/trading');
 					return data;

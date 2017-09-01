@@ -18,5 +18,5 @@ angular.module('homeCtrl', ['homeService'])
 				$timeout(vm.getMarkets, 5000);
 			}
 		};
-		$timeout(vm.getMarkets, 5000);
+		$timeout(vm.getMarkets);
 	});

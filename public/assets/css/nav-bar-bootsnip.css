@@ -1,0 +1,66 @@
+/*!
+ * Start Bootstrap - Logo Nav HTML Template (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+body {
+    padding-top: 70px;
+    /* Required padding for .navbar-fixed-top. Change if height of navigation changes. */
+}
+
+.navbar-fixed-top .nav {
+    padding: 0px 0;
+}
+
+.navbar-fixed-top .navbar-brand {
+    padding: 0 0px;
+}
+
+@media(min-width:768px) {
+    body {
+        padding-top: 100px;
+        /* Required padding for .navbar-fixed-top. Change if height of navigation changes. */
+    }
+    .navbar-fixed-top .navbar-brand {
+        padding: 20px 0;
+    }
+}
+
+.navbar-fixed-top .navbar-nav>li>a:hover,
+.navbar-fixed-top .navbar-nav>li>a:focus {
+    color: #000;
+    /*Sets the text hover color on navbar*/
+}
+
+.navbar-fixed-top .navbar-nav>.active>a,
+.navbar-fixed-top .navbar-nav>.active>a:hover,
+.navbar-fixed .navbar-nav>.active>a:focus {
+    color: #FF0000;
+    /*BACKGROUND color for active*/
+}
+
+.navbar-fixed-top {
+    background-color: #0f006f;
+    border-color: #030033;
+}
+
+.dropdown-menu>li>a:hover,
+.dropdown-menu>li>a:focus {
+    color: #262626;
+    text-decoration: none;
+    background-color: #66CCFF;
+    /*change color of links in drop down here*/
+}
+
+.nav>li>a:hover,
+.nav>li>a:focus {
+    text-decoration: none;
+    background-color: silver;
+    /*Change rollover cell color here*/
+}
+
+.navbar-fixed-top .navbar-nav>li>a {
+    color: white;
+    /*Change active text color here*/
+}
