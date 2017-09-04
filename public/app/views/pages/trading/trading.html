@@ -1,50 +1,183 @@
+<style>
+	.trade-area {
+		border: 1px solid #000;
+		border-radius: 10px;
+		margin-bottom: 2em;
+	}
+
+	.trade-control {
+		padding-bottom: 2em;
+	}
+
+	input {
+		width: 100%;
+		font-size: 1.3em;
+	}
+
+	select {
+		width: 100%;
+		font-size: 1.3em;
+	}
+
+	.btn {
+		width: 100%;
+	}
+
+	.log-area {
+    	display: table;
+		height: 100%;
+	}
+
+	.log-area > textarea, .log-area > div {
+		display: table-row;
+		border: none;  /* if you keep border then textarea will go out of the parent element */
+		height: 700px; /* hardcoded */
+		padding: 0px;  /* removing padding for chrome */
+		width: 100%;
+		color: white;
+		background-color: darkslategrey;
+	}
+</style>
+
 <h1 class="display-3">Trading Area USDT-</h1>
 
-<div class="col-md-2">
-	<b>Select your market:</b>
-	<select name="" id="ddlMarketName" class="form-control col-md-3" ng-init="trade.marketName='Please choice'" ng-model="trade.marketName" required="required" >
-			<option value="{{trade.marketName}}">{{trade.marketName}}</option>
-			<option ng-repeat="market in trade.Markets" value="{{market.MarketName}}">{{market.MarketName}}</option>
-	</select>
+<div class="col-md-2 ">
 </div>
-<div class="col-md-4">
-	<form ng-submit="trade.buyLimit()" id="formBuyLimit" class="form-group">
-		<div class="form-group">
-			<label for="marketName">Market Name: </label>
-			<p id="marketName">{{ trade.marketName }}</p>		
-		</div>
-		<div class="form-group">
-			<label for="quantity">Quantity: </label>
-			<input type="text" ng-model="trade.quantity" id="quantity" class="form-control">
-		</div>
-		<div class="form-group">
-			<label for="quantity">Rate: </label>		
-			<input type="text" ng-model="trade.rate" id="rate" class="form-control">
-		</div>
-		<div ng-if="trade.warningBuy" class="alert alert-warning">
-			<strong>Warning!</strong> {{trade.warningBuy}}
-		</div>	  
-		<button type="submit" class="btn btn-default" style="width: 20%">Buy</button>
-	</form>
-</div>
+<div class="col-md-8">
+	<div class="col-md-12">
+		<table class="table table-striped table-hover col-md-12">
+			<thead>
+				<tr>
+					<th>Market Name</th>
+					<th>High</th>
+					<th>Low</th>
+					<th>Volume</th>
+					<th>Last</th>
+					<th>Base Volume</th>
+					<th>Bid</th>
+					<th>Ask</th>
+					<th>Time Stamp</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ trade.currentMarket.MarketName }}</td>
+					<td>{{ trade.currentMarket.High }}</td>
+					<td>{{ trade.currentMarket.Low }}</td>
+					<td>{{ trade.currentMarket.Volume }}</td>
+					<td>{{ trade.currentMarket.Last }}</td>
+					<td>{{ trade.currentMarket.BaseVolume }}</td>
+					<td>{{ trade.currentMarket.Bid }}</td>
+					<td>{{ trade.currentMarket.Ask }}</td>
+					<td>{{ trade.currentMarket.TimeStamp }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
-<div class="col-md-4">
-	<form ng-submit="trade.sellLimit()" id="formSellLimit" class="form-group">
-		<div class="form-group">
-			<label for="marketName">Market Name: </label>
-			<p id="marketName">{{ trade.marketName }}</p>		
+	<div class="col-md-12 trade-area">
+		<h4>TRADE AREA</h4>
+		<form ng-submit="trade.setupAutoTrade()" id="formBuyLimit" class="form-group">
+			<div class="col-md-12">
+				<div class="col-md-8 trade-control">
+					<div class="col-md-12 form-group">
+						<label for="ddlMarketName">Select your market: </label>
+						<select id="ddlMarketName" class="" ng-model="trade.marketName" ng-disabled="trade.isConfirm" required="required">
+							<option value="{{trade.marketName}}">{{trade.marketName}}</option>
+							<option ng-repeat="market in trade.Markets" value="{{market.MarketName}}">{{market.MarketName}}</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-4 trade-control">
+					<div class="col-md-12 form-group">
+						<label for="autoLimitCoin1">Limit {{trade.currentMarket.MarketName.split('-')[0]}}: </label>
+						<input id="autoLimitCoin1" ng-model="trade.autoData.autoLimitCoin1" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0"
+						    required>
+					</div>
+					<div class="col-md-12 form-group">
+						<label for="autoLimitCoin2">Limit {{trade.currentMarket.MarketName.split('-')[1]}}: </label>
+						<input id="autoLimitCoin2" ng-model="trade.autoData.autoLimitCoin2" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0"
+								required>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="col-md-8 trade-control">
+					<div class="col-md-6 form-group">
+						<label for="autoBasePriceTime">Base Time: </label>
+						<input id="autoBasePriceTime" ng-model="trade.autoData.basePriceTime" placeholder="00:00:00" value="00:00:00" type="text"
+						    ng-disabled="trade.isConfirm" required>
+					</div>
+					<div class="col-md-6 form-group">
+						<label for="basePriceTimeDelay">Delay: </label>
+						<input id="basePriceTimeDelay" ng-model="trade.autoData.basePriceTimeDelay" placeholder="0s" type="text" place-holder="0s" disabled>
+					</div>
+					<div class="col-md-6 form-group">
+						<label for="autoTradeTime">Trade Time: </label>
+						<input id="autoTradeTime" ng-model="trade.autoData.autoTradeTime" placeholder="00:00:00" type="text" ng-disabled="trade.isConfirm"
+						    required>
+					</div>
+					<div class="col-md-6 form-group">
+							<label for="autoTradeTimeDelay">Delay: </label>
+							<input id="autoTradeTimeDelay" ng-model="trade.autoData.autoTradeTimeDelay" placeholder="0s" type="text" place-holder="0s" disabled>
+						</div>
+				</div>
+
+				<div class="col-md-4 trade-control">
+					<div class="col-md-12 form-group">
+						<label for="autoTBuy">T-Buy: </label>
+						<input id="autoTBuy" ng-model="trade.autoData.autoTBuy" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0" required>
+					</div>
+					<div class="col-md-12 form-group">
+						<label for="autoTSell">T-Sell: </label>
+						<input id="autoTSell" ng-model="trade.autoData.autoTSell" type="number" ng-disabled="trade.isConfirm" step="any" max="0" placeholder="0" required>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="col-md-12 trade-control">
+					<div class="col-md-6 form-group">
+						<label for="autoPrice">Price: </label>
+						<input id="autoPrice" ng-model="trade.autoData.autoPrice" type="number" disabled step="any" min="0" placeholder="0" required>
+					</div>
+					<div class="col-md-6 form-group">
+						<label for="autoBasePrice">Base Price: </label>
+						<input id="autoBasePrice" ng-model="trade.autoData.autoBasePrice" type="number" disabled step="any" min="0" placeholder="0"
+						    required>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12 trade-control">
+				<div class="col-md-4">
+					<button type="submit" class="btn btn-success" ng-disabled="trade.isConfirm">
+						<span>Confirm</span>
+					</button>
+				</div>
+				<div class="col-md-4" ng-if="trade.isConfirm">
+					<button class="btn btn-primary" ng-click="trade.startAutos()" ng-disabled="trade.isStartAutos">
+						<span>Start</span>
+					</button>
+				</div>
+				<div class="col-md-4" ng-if="trade.isConfirm">
+					<button class="btn btn-danger" ng-click="trade.stopAutos()" ng-disabled="!trade.isStartAutos">
+						<span>Stop</span>
+					</button>
+				</div>
+			</div>
+
+			<div class="col-md-12 trade-control">
+				<div ng-if="trade.dangerFormAuto" class="alert alert-danger">
+					<strong>Dangerous!</strong> {{trade.dangerFormAuto}}
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div class="col-md-12 log-area">
+			<textarea name="" id="" cols="auto" rows="auto" disabled ng-model="trade.tradeLog"></textarea>
 		</div>
-		<div class="form-group">
-			<label for="quantity">Quantity: </label>
-			<input type="text" ng-model="trade.quantity" id="quantity" class="form-control">
-		</div>
-		<div class="form-group">
-			<label for="quantity">Rate: </label>		
-			<input type="text" ng-model="trade.rate" id="rate" class="form-control">
-		</div>
-		<div ng-if="trade.warningSell" class="alert alert-warning">
-			<strong>Warning!</strong> {{trade.warningSell}}
-		</div>	  
-		<button type="submit" class="btn btn-default" style="width: 20%">Sell</button>
-	</form>
+
 </div>

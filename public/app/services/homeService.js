@@ -3,7 +3,7 @@ angular.module('homeService', [])
 		var homeFactory = {};
 		
 		homeFactory.getMarkets = function(reqMarketType) {
-			return $http.post('api/markets', {marketType: reqMarketType})
+			return $http.post('api/marketsummaries', {marketType: reqMarketType})
 				.then(function (response) {
 					return response.data.markets;
 				})

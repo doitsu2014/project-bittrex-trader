@@ -34,11 +34,9 @@ module.exports = function (app, express) {
 	});
 
 	apiRouter.use(function (req, res, next) {
-		console.log("Somebody came middleware");
 		var doitsuSecret = config.secret;
 		var token = req.body.token || req.params.token || req.headers['x-access-token'];
 		if (token) {
-			console.log("Verifing Token");
 			jsonwebtoken.verify(token, doitsuSecret, function (err, decoded) {
 				if (err) {
 					return res.json({
@@ -59,7 +57,7 @@ module.exports = function (app, express) {
 		}
 	});
 
-	apiRouter.route('/markets')
+	apiRouter.route('/marketsummaries')
 		.post(function (req, res) {
 			bittrex.getmarketsummaries(function (data, err) {
 				if (err) {
@@ -74,12 +72,29 @@ module.exports = function (app, express) {
 			})
 		});
 
+	apiRouter.route('/marketsummary')
+		.post(function (req, res) {
+			bittrex.getmarketsummary({
+				market: req.body.marketName
+			}, function (data, err) {
+				if (err) {
+					console.log("Response Err: ");
+					return res.json({
+						success: false,
+						message: err
+					});
+				}
+				res.json({
+					market: data.result
+				});
+			});
+		});
+
 	apiRouter.route('/markets/buylimit')
 		.post(function (req, res) {
 			var reqMarketName = req.body.reqMarketName;
 			var reqQuantity = req.body.reqQuantity;
 			var reqRate = req.body.reqRate;
-			console.log(`reqMarketName ${reqMarketName} --- reqQuantity ${reqQuantity} --- reqRate ${reqRate}`);
 			bittrex.buylimit({
 				market: reqMarketName,
 				quantity: reqQuantity,
@@ -89,6 +104,7 @@ module.exports = function (app, express) {
 					res.send(err);
 					return console.log(err);
 				}
+				console.log(data);
 				res.json(data);
 			});
 		});
@@ -98,7 +114,6 @@ module.exports = function (app, express) {
 			var reqMarketName = req.body.reqMarketName;
 			var reqQuantity = req.body.reqQuantity;
 			var reqRate = req.body.reqRate;
-
 			bittrex.selllimit({
 				marmarket: reqMarketName,
 				quantity: reqQuantity,
@@ -111,10 +126,29 @@ module.exports = function (app, express) {
 				res.json(data);
 			});
 		});
+
+	apiRouter.route('/markets/getordersbook')
+		.post(function (req, res) {
+			
+			var reqMarketName = req.body.reqMarketName;
+			var reqType = req.body.reqType;
+
+			bittrex.getorderbook({
+				market: reqMarketName,
+				type: reqType
+			}, function (data, err) {
+				if (err) {
+					return res.send(err);
+				}
+				res.json({Orders: data.result});
+			});
+		});
+		
 	apiRouter.route('/me')
 		.get(function (req, res) {
 			res.send(req.decoded);
 		});
 
 	return apiRouter;
-}
+};
+

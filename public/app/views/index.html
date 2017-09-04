@@ -8,6 +8,7 @@
 	<title>Doitsu Bitcoin Tools</title>
 	<base href="/">
 	<!-- Bootstrap CSS -->
+	<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="assets\css\nav-bar-bootsnip.css">
@@ -30,19 +31,22 @@
 
 	<style>
 		body {
-			background-image:url("assets/images/bitcoin-background.jpg")
+			background-image: url("assets/images/bitcoin-background.jpg");
+			font-family: 'Roboto', sans-serif;
 		}
+
 		.main-views {
-			background-color: rgba(255,255,255,0.8);
-   			border-radius: 2em;
+			background-color: rgba(255, 255, 255, 0.8);
+			border-radius: 2em;
 		}
+
 		.jumbotron {
 			margin-top: 10px;
 		}
 	</style>
 </head>
 
-<body ng-app="userApp" ng-controller="MainController as main" >
+<body ng-app="userApp" ng-controller="MainController as main">
 	<!-- Navigation -->
 	<nav class="navbar navbar-fixed-top" role="navigation">
 		<div class="container">
@@ -83,14 +87,9 @@
 		</div>
 		<!-- /.container -->
 	</nav>
+	<div class="col-lg-10 col-md-offset-1 main-views" ng-view>
 
-	<div class="container col-md-12" style="position: relative;" >
-		<div class="col-md-12 main-views" ng-view>
-
-		</div>
 	</div>
-
-
 
 	<!-- jQuery -->
 	<!-- Bootstrap JavaScript -->
