@@ -164,15 +164,11 @@ angular.module('tradeCtrl', ['tradeService'])
 						vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
 						var typeOfTrade = checkConditions();
 						if (typeOfTrade === Constants.TypeOfTrade.buy) {
-							vm.tradeLog += "Action: Buy\n";
-							// buyLimit();
+							buyLimit();
 						} else if (typeOfTrade === Constants.TypeOfTrade.sell) {
-							vm.tradeLog += "Action: Sell\n";
 							sellLimit();							
 						} else {
-							vm.tradeLog += "Action: Do nothing\n";
-							sellLimit();
-
+							vm.tradeLog += "Do nothing\n";
 						}
 					}
 					$timeout(autoTrade, 1000);
