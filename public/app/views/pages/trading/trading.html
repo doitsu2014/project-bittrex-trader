@@ -156,13 +156,13 @@
 						<span>Confirm</span>
 					</button>
 				</div>
-				<div class="col-md-4" ng-if="trade.isConfirm">
-					<button class="btn btn-primary" ng-click="trade.startAutos()" ng-disabled="trade.isStartAutos">
+				<div class="col-md-4">
+					<button class="btn btn-primary" ng-click="trade.startAutos()" ng-disabled="!trade.isConfirm || trade.isStartAutos">
 						<span>Start</span>
 					</button>
 				</div>
-				<div class="col-md-4" ng-if="trade.isConfirm">
-					<button class="btn btn-danger" ng-click="trade.stopAutos()" ng-disabled="!trade.isStartAutos">
+				<div class="col-md-4" >
+					<button class="btn btn-danger" ng-click="trade.stopAutos()" ng-disabled="!trade.isConfirm || !trade.isStartAutos">
 						<span>Stop</span>
 					</button>
 				</div>

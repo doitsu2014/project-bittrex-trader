@@ -19,10 +19,10 @@ angular.module('tradeCtrl', ['tradeService'])
 			TradeService.getMarket(vm.marketName || 'USDT-BTC')
 				.then(function (data) {
 					vm.currentMarket = data ? data[0] : null;
+					if ($location.path() === tradeUrl) {
+						$timeout(vm.getMarket, 500);
+					}
 				});
-			if ($location.path() === tradeUrl) {
-				$timeout(vm.getMarket, 1000);
-			}
 		};
 		vm.getMarket();
 
@@ -100,17 +100,18 @@ angular.module('tradeCtrl', ['tradeService'])
 				if (goodQuantity > 0) {
 					if (goodQuantity <= ordersBook[i].Quantity) {
 						// buy all good quantity
-						TradeService.sellLimit(vm.currentMarket.MarketName, goodQuantity, ordersBook[i].Rate)
+
+						TradeService.sellLimit( vm.currentMarket.MarketName, goodQuantity, ordersBook[i].Rate)
 							.then(function (data) {
-								vm.tradeLog += `Sell: q_${goodQuantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}`;								
+								vm.tradeLog += `Sell: q_${goodQuantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}\n`;								
 							});
 						baseQuantity -= goodQuantity;
 						return;
 					} else {
 						// buy all order Quantity
-						TradeService.sellLimit(vm.currentMarket.MarketName, ordersBook[i].Quantity, ordersBook[i].Rate)
+						TradeService.sellLimit( vm.currentMarket.MarketName, ordersBook[i].Quantity, ordersBook[i].Rate)
 							.then(function (data) {
-								vm.tradeLog += `Sell: q_${ordersBook[i].Quantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}`;								
+								vm.tradeLog += `Sell: q_${ordersBook[i].Quantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}\n`;								
 							});
 						baseQuantity -= Number.parseFloat(ordersBook[i].Quantity);
 					}
