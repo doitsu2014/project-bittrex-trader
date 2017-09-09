@@ -90,6 +90,11 @@
 				</div>
 				<div class="col-md-4 trade-control">
 					<div class="col-md-12 form-group">
+						<label for="autoLimitCoin1">Temp Balance {{trade.currentMarket.MarketName.split('-')[0]}}: </label>
+						<input id="autoLimitCoin1" ng-model="trade.autoData.autoTempBalance" type="number" ng-disabled="true" step="any" min="0" placeholder="0"
+							required>
+					</div>
+					<div class="col-md-12 form-group">
 						<label for="autoLimitCoin1">Limit {{trade.currentMarket.MarketName.split('-')[0]}}: </label>
 						<input id="autoLimitCoin1" ng-model="trade.autoData.autoLimitCoin1" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0"
 						    required>
@@ -156,13 +161,13 @@
 						<span>Confirm</span>
 					</button>
 				</div>
-				<div class="col-md-4" ng-if="trade.isConfirm">
-					<button class="btn btn-primary" ng-click="trade.startAutos()" ng-disabled="trade.isStartAutos">
+				<div class="col-md-4">
+					<button class="btn btn-primary" ng-click="trade.startAutos()" ng-disabled="!trade.isConfirm || trade.isStartAutos">
 						<span>Start</span>
 					</button>
 				</div>
-				<div class="col-md-4" ng-if="trade.isConfirm">
-					<button class="btn btn-danger" ng-click="trade.stopAutos()" ng-disabled="!trade.isStartAutos">
+				<div class="col-md-4" >
+					<button class="btn btn-danger" ng-click="trade.stopAutos()" ng-disabled="!trade.isConfirm">
 						<span>Stop</span>
 					</button>
 				</div>

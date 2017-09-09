@@ -92,6 +92,10 @@ module.exports = function (app, express) {
 
 	apiRouter.route('/markets/buylimit')
 		.post(function (req, res) {
+			bittrex.options({
+				'apikey': req.decoded.bittrexKey,
+				'apisecret': req.decoded.bittrexSecret
+			});
 			var reqMarketName = req.body.reqMarketName;
 			var reqQuantity = req.body.reqQuantity;
 			var reqRate = req.body.reqRate;
@@ -111,11 +115,15 @@ module.exports = function (app, express) {
 
 	apiRouter.route('/markets/selllimit')
 		.post(function (req, res) {
+			bittrex.options({
+				'apikey': req.decoded.bittrexKey,
+				'apisecret': req.decoded.bittrexSecret
+			});
 			var reqMarketName = req.body.reqMarketName;
 			var reqQuantity = req.body.reqQuantity;
 			var reqRate = req.body.reqRate;
 			bittrex.selllimit({
-				marmarket: reqMarketName,
+				market: reqMarketName,
 				quantity: reqQuantity,
 				rate: reqRate
 			}, function (data, err) {

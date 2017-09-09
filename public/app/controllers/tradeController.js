@@ -19,24 +19,23 @@ angular.module('tradeCtrl', ['tradeService'])
 			TradeService.getMarket(vm.marketName || 'USDT-BTC')
 				.then(function (data) {
 					vm.currentMarket = data ? data[0] : null;
+					if ($location.path() === tradeUrl) {
+						$timeout(vm.getMarket, 500);
+					}
 				});
-			if ($location.path() === tradeUrl) {
-				$timeout(vm.getMarket, 1000);
-			}
 		};
 		vm.getMarket();
 
 		var buyLimit = function () {
 			var reqMarketName = vm.currentMarket.MarketName;
 			var reqQuantity = vm.autoData.autoLimitCoin1;
-			// var typeOfCoin1 = vm.currentMarket.MarketName.split('-')[0];
 			buyFunction(reqMarketName, reqQuantity);
 		};
 
 		var buyFunction = function (reqMarketName, reqQuantity) {
 			console.log('Buy Function');
 			// get list order book 
-			TradeService.getOrdersBook(reqMarketName, 'buy')
+			TradeService.getOrdersBook(reqMarketName, 'sell')
 				.then(function (data) {
 					if (data) {
 						analystBuyFunction(data.data.Orders, reqQuantity);
@@ -50,6 +49,7 @@ angular.module('tradeCtrl', ['tradeService'])
 			var baseQuantity = reqQuantity;
 			var result = [];
 			for (var i = 0; i < ordersBook.length; ++i) {
+				// good quantity, you have to pay 
 				var goodQuantity = Number.parseFloat(baseQuantity) / Number.parseFloat(ordersBook[i].Rate);
 				if (goodQuantity > 0) {
 					if (goodQuantity <= ordersBook[i].Quantity) {
@@ -82,7 +82,7 @@ angular.module('tradeCtrl', ['tradeService'])
 		var sellFunction = function (reqMarketName, reqQuantity) {
 			console.log('Sell Function');
 			// get list order book 
-			TradeService.getOrdersBook(reqMarketName, 'sell')
+			TradeService.getOrdersBook(reqMarketName, 'buy')
 				.then(function (data) {
 					if (data) {
 						analystSellFunction(data.data.Orders, reqQuantity);
@@ -99,18 +99,18 @@ angular.module('tradeCtrl', ['tradeService'])
 				var goodQuantity = baseQuantity;
 				if (goodQuantity > 0) {
 					if (goodQuantity <= ordersBook[i].Quantity) {
-						// buy all good quantity
-						TradeService.sellLimit(vm.currentMarket.MarketName, goodQuantity, ordersBook[i].Rate)
+						// sell all good quantity
+						TradeService.sellLimit( vm.currentMarket.MarketName, goodQuantity, ordersBook[i].Rate)
 							.then(function (data) {
-								vm.tradeLog += `Sell: q_${goodQuantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}`;								
+								vm.tradeLog += `Sell: q_${goodQuantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}\n`;								
 							});
 						baseQuantity -= goodQuantity;
 						return;
 					} else {
-						// buy all order Quantity
-						TradeService.sellLimit(vm.currentMarket.MarketName, ordersBook[i].Quantity, ordersBook[i].Rate)
+						// sell all order Quantity
+						TradeService.sellLimit( vm.currentMarket.MarketName, ordersBook[i].Quantity, ordersBook[i].Rate)
 							.then(function (data) {
-								vm.tradeLog += `Sell: q_${ordersBook[i].Quantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}`;								
+								vm.tradeLog += `Sell: q_${ordersBook[i].Quantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}\n`;								
 							});
 						baseQuantity -= Number.parseFloat(ordersBook[i].Quantity);
 					}
@@ -124,8 +124,9 @@ angular.module('tradeCtrl', ['tradeService'])
 			vm.dangerFormAuto = validateFormAuto();
 			if (!vm.dangerFormAuto) {
 				alert(`
-				-- Market Name: ${vm.marketName} 
-				-- Amount: ${vm.autoData.amount} 
+				-- Market Name: ${vm.currentMarket.MarketName} 
+				-- Limit Coin 1: ${vm.autoData.autoLimitCoin1} 
+				-- Limit Coin 2: ${vm.autoData.autoLimitCoin1} 
 				-- Base Price Time ${vm.autoData.basePriceTime} 
 				-- T-Buy ${vm.autoData.autoTBuy} 
 				-- T-Sell ${vm.autoData.autoTSell}
@@ -137,10 +138,9 @@ angular.module('tradeCtrl', ['tradeService'])
 
 		vm.stopAutos = function () {
 			if (vm.isConfirm) {
-				if (vm.isStartAutos) {
+				
 					vm.isStartAutos = false;
 					vm.isConfirm = false;
-				}
 			}
 		};
 
@@ -168,7 +168,7 @@ angular.module('tradeCtrl', ['tradeService'])
 						} else if (typeOfTrade === Constants.TypeOfTrade.sell) {
 							sellLimit();							
 						} else {
-							vm.tradeLog += "Do nothing\n";
+							// vm.tradeLog += "Don't buy or sell\n";
 						}
 					}
 					$timeout(autoTrade, 1000);
