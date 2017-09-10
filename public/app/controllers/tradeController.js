@@ -6,7 +6,7 @@ angular.module('tradeCtrl', ['tradeService'])
 			doNothing: 3
 		}
 	})
-	.controller('TradeController', function ($scope, $timeout, $interval, $location,$q, TradeService, Constants) {
+	.controller('TradeController', function ($scope, $timeout, $interval, $location, $q, TradeService, Constants) {
 		var vm = this;
 		var tradeUrl = $location.path();
 		TradeService.getMarkets(vm.marketType || 'USDT-')
@@ -26,17 +26,17 @@ angular.module('tradeCtrl', ['tradeService'])
 		};
 		vm.getMarket();
 
-		
+
 		vm.getBalance = () => {
-			var reqCurrency = vm.currentMarket? vm.currentMarket.MarketName.split('-')[1] : "BTC";
+			var reqCurrency = vm.currentMarket ? vm.currentMarket.MarketName.split('-')[1] : "BTC";
 			return $q((resolve, reject) => {
 				TradeService.getBalance(reqCurrency)
 					.then(data => {
 						resolve(data.data.balance);
 					});
-			}); 
+			});
 		};
-		
+
 		vm.isConfirm = false;
 		vm.isStartAutos = false;
 		vm.setupAutoTrade = function () {
@@ -57,8 +57,8 @@ angular.module('tradeCtrl', ['tradeService'])
 
 		vm.stopAutos = function () {
 			if (vm.isConfirm) {
-					vm.isStartAutos = false;
-					vm.isConfirm = false;
+				vm.isStartAutos = false;
+				vm.isConfirm = false;
 			}
 		};
 
@@ -78,7 +78,7 @@ angular.module('tradeCtrl', ['tradeService'])
 				if (vm.isStartAutos) {
 					if (vm.autoData.autoTradeTimeDelay != 0) {
 						vm.autoData.autoTradeTimeDelay -= 1;
-						$timeout(autoTrade, 1000);						
+						$timeout(autoTrade, 1000);
 					} else {
 						vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
 						// check temp balance
@@ -86,7 +86,7 @@ angular.module('tradeCtrl', ['tradeService'])
 						var typeOfTrade;
 						if (x > 0) {
 							// check buy and sell 
-							typeOfTrade = checkConditions();						
+							typeOfTrade = checkConditions();
 							if (typeOfTrade === Constants.TypeOfTrade.buy) {
 								// after buyLimit will setTimeout
 								buyLimit();
@@ -106,26 +106,16 @@ angular.module('tradeCtrl', ['tradeService'])
 								$timeout(autoTrade, 1000);
 							}
 						}
-
-						// var typeOfTrade = checkConditions();
-						// if (typeOfTrade === Constants.TypeOfTrade.buy) {
-						// 	buyLimit();
-						// } else if (typeOfTrade === Constants.TypeOfTrade.sell) {
-						// 	sellLimit();
-						// } else {
-						// 	$timeout(autoTrade, 1000);
-						// }
 					}
-			
+
 				}
 			}
 		};
 
-		
 		var buyLimit = function () {
 			var reqMarketName = vm.currentMarket.MarketName;
 			var reqQuantity = vm.autoData.autoLimitCoin2;
-			TradeService.buyLimit2(reqMarketName,reqQuantity)
+			TradeService.buyLimit2(reqMarketName, reqQuantity)
 				.then(function (data) {
 					vm.autoData.autoTempBalance += data.data.totalSuccess;
 					vm.tradeLog += data.data.message;
@@ -133,9 +123,6 @@ angular.module('tradeCtrl', ['tradeService'])
 				});
 		};
 
-		vm._testSellLimit = function () {
-			sellLimit();
-		}
 		var sellLimit = function () {
 			var reqMarketName = vm.currentMarket.MarketName;
 			vm.getBalance()
