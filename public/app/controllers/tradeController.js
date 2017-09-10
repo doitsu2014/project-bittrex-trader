@@ -6,7 +6,7 @@ angular.module('tradeCtrl', ['tradeService'])
 			doNothing: 3
 		}
 	})
-	.controller('TradeController', function ($scope, $timeout, $interval, $location, TradeService, Constants) {
+	.controller('TradeController', function ($scope, $timeout, $interval, $location,$q, TradeService, Constants) {
 		var vm = this;
 		var tradeUrl = $location.path();
 		TradeService.getMarkets(vm.marketType || 'USDT-')
@@ -26,98 +26,17 @@ angular.module('tradeCtrl', ['tradeService'])
 		};
 		vm.getMarket();
 
-		var buyLimit = function () {
-			var reqMarketName = vm.currentMarket.MarketName;
-			var reqQuantity = vm.autoData.autoLimitCoin1;
-			buyFunction(reqMarketName, reqQuantity);
+		
+		vm.getBalance = () => {
+			var reqCurrency = vm.currentMarket? vm.currentMarket.MarketName.split('-')[1] : "BTC";
+			return $q((resolve, reject) => {
+				TradeService.getBalance(reqCurrency)
+					.then(data => {
+						resolve(data.data.balance);
+					});
+			}); 
 		};
-
-		var buyFunction = function (reqMarketName, reqQuantity) {
-			console.log('Buy Function');
-			// get list order book 
-			TradeService.getOrdersBook(reqMarketName, 'sell')
-				.then(function (data) {
-					if (data) {
-						analystBuyFunction(data.data.Orders, reqQuantity);
-					}
-				});
-		};
-
-		var analystBuyFunction = function (ordersBook, reqQuantity) {
-			console.log('analyst buy function');
-			// return list of Key, Value (quantity, rate)
-			var baseQuantity = reqQuantity;
-			var result = [];
-			for (var i = 0; i < ordersBook.length; ++i) {
-				// good quantity, you have to pay 
-				var goodQuantity = Number.parseFloat(baseQuantity) / Number.parseFloat(ordersBook[i].Rate);
-				if (goodQuantity > 0) {
-					if (goodQuantity <= ordersBook[i].Quantity) {
-						// buy all good quantity
-						TradeService.buyLimit(vm.currentMarket.MarketName, goodQuantity, ordersBook[i].Rate)
-							.then(function (data) {
-									vm.tradeLog += `Buy: q_${goodQuantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}\n`;
-							});
-						baseQuantity -= Number.parseFloat(ordersBook[i].Rate) * goodQuantity;
-						return;
-					} else {
-						// buy all order Quantity
-						TradeService.buyLimit(vm.currentMarket.MarketName, ordersBook[i].Quantity, ordersBook[i].Rate)
-							.then(function (data) {
-								vm.tradeLog += `Buy: q_${ordersBook[i].Quantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}\n`;								
-							});
-						baseQuantity -= Number.parseFloat(ordersBook[i].Rate) * Number.parseFloat(ordersBook[i].Quantity);
-					}
-				}
-			}
-		};
-
-		var sellLimit = function () {
-			var reqMarketName = vm.currentMarket.MarketName;
-			var reqQuantity = vm.autoData.autoLimitCoin2;
-			// var typeOfCoin1 = vm.currentMarket.MarketName.split('-')[0];
-			sellFunction(reqMarketName, reqQuantity);
-		};
-
-		var sellFunction = function (reqMarketName, reqQuantity) {
-			console.log('Sell Function');
-			// get list order book 
-			TradeService.getOrdersBook(reqMarketName, 'buy')
-				.then(function (data) {
-					if (data) {
-						analystSellFunction(data.data.Orders, reqQuantity);
-					}
-				});
-		};
-
-		var analystSellFunction = function (ordersBook, reqQuantity) {
-			console.log('analyst sell function');
-			// return list of Key, Value (quantity, rate)
-			var baseQuantity = reqQuantity;
-			var result = [];
-			for (var i = 0; i < ordersBook.length; ++i) {
-				var goodQuantity = baseQuantity;
-				if (goodQuantity > 0) {
-					if (goodQuantity <= ordersBook[i].Quantity) {
-						// sell all good quantity
-						TradeService.sellLimit( vm.currentMarket.MarketName, goodQuantity, ordersBook[i].Rate)
-							.then(function (data) {
-								vm.tradeLog += `Sell: q_${goodQuantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}\n`;								
-							});
-						baseQuantity -= goodQuantity;
-						return;
-					} else {
-						// sell all order Quantity
-						TradeService.sellLimit( vm.currentMarket.MarketName, ordersBook[i].Quantity, ordersBook[i].Rate)
-							.then(function (data) {
-								vm.tradeLog += `Sell: q_${ordersBook[i].Quantity} --- r_${ordersBook[i].Rate} --- m_${data.data.message}\n`;								
-							});
-						baseQuantity -= Number.parseFloat(ordersBook[i].Quantity);
-					}
-				}
-			}
-		};
-
+		
 		vm.isConfirm = false;
 		vm.isStartAutos = false;
 		vm.setupAutoTrade = function () {
@@ -138,7 +57,6 @@ angular.module('tradeCtrl', ['tradeService'])
 
 		vm.stopAutos = function () {
 			if (vm.isConfirm) {
-				
 					vm.isStartAutos = false;
 					vm.isConfirm = false;
 			}
@@ -160,22 +78,77 @@ angular.module('tradeCtrl', ['tradeService'])
 				if (vm.isStartAutos) {
 					if (vm.autoData.autoTradeTimeDelay != 0) {
 						vm.autoData.autoTradeTimeDelay -= 1;
+						$timeout(autoTrade, 1000);						
 					} else {
 						vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
-						var typeOfTrade = checkConditions();
-						if (typeOfTrade === Constants.TypeOfTrade.buy) {
-							buyLimit();
-						} else if (typeOfTrade === Constants.TypeOfTrade.sell) {
-							sellLimit();							
+						// check temp balance
+						var x = vm.autoData.autoLimitCoin2 - vm.autoData.autoTempBalance;
+						var typeOfTrade;
+						if (x > 0) {
+							// check buy and sell 
+							typeOfTrade = checkConditions();						
+							if (typeOfTrade === Constants.TypeOfTrade.buy) {
+								// after buyLimit will setTimeout
+								buyLimit();
+							} else if (typeOfTrade === Constants.TypeOfTrade.sell) {
+								// after sellLimit will setTimeout
+								sellLimit();
+							} else {
+								// otherwise
+								$timeout(autoTrade, 1000);
+							}
 						} else {
-							// vm.tradeLog += "Don't buy or sell\n";
+							typeOfTrade = checkConditions();
+							if (typeOfTrade === Constants.TypeOfTrade.sell) {
+								// after sellLimit will setTimeout								
+								sellLimit();
+							} else {
+								$timeout(autoTrade, 1000);
+							}
 						}
+
+						// var typeOfTrade = checkConditions();
+						// if (typeOfTrade === Constants.TypeOfTrade.buy) {
+						// 	buyLimit();
+						// } else if (typeOfTrade === Constants.TypeOfTrade.sell) {
+						// 	sellLimit();
+						// } else {
+						// 	$timeout(autoTrade, 1000);
+						// }
 					}
-					$timeout(autoTrade, 1000);
+			
 				}
 			}
 		};
 
+		
+		var buyLimit = function () {
+			var reqMarketName = vm.currentMarket.MarketName;
+			var reqQuantity = vm.autoData.autoLimitCoin2;
+			TradeService.buyLimit2(reqMarketName,reqQuantity)
+				.then(function (data) {
+					vm.autoData.autoTempBalance += data.data.totalSuccess;
+					vm.tradeLog += data.data.message;
+					$timeout(autoTrade, 1000);
+				});
+		};
+
+		vm._testSellLimit = function () {
+			sellLimit();
+		}
+		var sellLimit = function () {
+			var reqMarketName = vm.currentMarket.MarketName;
+			vm.getBalance()
+				.then((data) => {
+					var reqQuantity = data.Available;
+					TradeService.sellLimit2(reqMarketName, reqQuantity)
+						.then(function (data) {
+							vm.autoData.autoTempBalance -= data.data.totalSuccess;
+							vm.tradeLog += data.data.message;
+							$timeout(autoTrade, 1000);
+						});
+				});
+		};
 		// this function will return type of trade
 		var checkConditions = function () {
 			var x = vm.autoData.autoPrice - vm.autoData.autoBasePrice;

@@ -19,7 +19,7 @@ angular.module('tradeService', [])
 		};
 
 		tradeFactory.buyLimit = function (reqMarketName, reqQuantity, reqRate) {
-			return $http.post('api/markets/buylimit', 
+			return $http.post('api/markets/buylimit2', 
 				{   
 					reqMarketName: reqMarketName,
 					reqQuantity: reqQuantity,
@@ -42,6 +42,42 @@ angular.module('tradeService', [])
 					return response;
 				})
 				.catch(error => {console.log(`Trade Service-sellLimit-ERROR:`); console.log(error)});
+		};
+
+		tradeFactory.buyLimit2 = function (reqMarketName, reqQuantity) {
+			return $http.post('api/markets/buylimit2', 
+				{   
+					reqMarketName: reqMarketName,
+					reqQuantity: reqQuantity,
+				})
+				.then(function (response) {
+					return response;
+				})
+				.catch(error => {console.log(`Trade Service-buyLimit-ERROR:`); console.log(error)});
+		};
+
+		tradeFactory.sellLimit2 = function (reqMarketName, reqQuantity) {
+			return $http.post('api/markets/selllimit2', 
+				{
+					reqMarketName: reqMarketName,
+					reqQuantity: reqQuantity
+				})
+				.then(function (response) {
+					return response;
+				})
+				.catch(error => {console.log(`Trade Service-sellLimit-ERROR:`); console.log(error)});
+		};
+
+		tradeFactory.getBalance = function (reqCurrency) {
+			console.log("Trade Service Get Order");
+			return $http.post('api/user/getbalance', 
+				{   
+					reqCurrency: reqCurrency
+				})
+				.then(function (response) {
+					return response;
+				})
+				.catch(error => {console.log(`Trade Service-Get Order-ERROR:`); console.log(error)});
 		};
 
 		tradeFactory.getOrdersBook = function (reqMarketName, reqType) {

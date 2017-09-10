@@ -90,18 +90,18 @@
 				</div>
 				<div class="col-md-4 trade-control">
 					<div class="col-md-12 form-group">
-						<label for="autoLimitCoin1">Temp Balance {{trade.currentMarket.MarketName.split('-')[0]}}: </label>
-						<input id="autoLimitCoin1" ng-model="trade.autoData.autoTempBalance" type="number" ng-disabled="true" step="any" min="0" placeholder="0"
+						<label for="autoTempBalance">Temp Balance {{trade.currentMarket.MarketName.split('-')[1]}}: </label>
+						<input id="autoTempBalance" ng-model="trade.autoData.autoTempBalance" type="number" ng-disabled="true" step="any" min="0" placeholder="0" ng-init="trade.autoData.autoTempBalance=0"
 							required>
 					</div>
-					<div class="col-md-12 form-group">
+					<!-- <div class="col-md-12 form-group">
 						<label for="autoLimitCoin1">Limit {{trade.currentMarket.MarketName.split('-')[0]}}: </label>
 						<input id="autoLimitCoin1" ng-model="trade.autoData.autoLimitCoin1" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0"
 						    required>
-					</div>
+					</div> -->
 					<div class="col-md-12 form-group">
 						<label for="autoLimitCoin2">Limit {{trade.currentMarket.MarketName.split('-')[1]}}: </label>
-						<input id="autoLimitCoin2" ng-model="trade.autoData.autoLimitCoin2" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0"
+						<input id="autoLimitCoin2"  ng-init="trade.autoData.autoLimitCoin2=0" ng-model="trade.autoData.autoLimitCoin2" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0"
 								required>
 					</div>
 				</div>
@@ -111,7 +111,7 @@
 				<div class="col-md-8 trade-control">
 					<div class="col-md-6 form-group">
 						<label for="autoBasePriceTime">Base Time: </label>
-						<input id="autoBasePriceTime" ng-model="trade.autoData.basePriceTime" placeholder="00:00:00" value="00:00:00" type="text"
+						<input id="autoBasePriceTime" ng-init="trade.autoData.basePriceTime='00:00:00'" ng-model="trade.autoData.basePriceTime" placeholder="00:00:00" value="00:00:00" type="text"
 						    ng-disabled="trade.isConfirm" required>
 					</div>
 					<div class="col-md-6 form-group">
@@ -120,23 +120,23 @@
 					</div>
 					<div class="col-md-6 form-group">
 						<label for="autoTradeTime">Trade Time: </label>
-						<input id="autoTradeTime" ng-model="trade.autoData.autoTradeTime" placeholder="00:00:00" type="text" ng-disabled="trade.isConfirm"
+						<input id="autoTradeTime" ng-init="trade.autoData.autoTradeTime='00:00:00'" ng-model="trade.autoData.autoTradeTime" placeholder="00:00:00" type="text" ng-disabled="trade.isConfirm"
 						    required>
 					</div>
 					<div class="col-md-6 form-group">
-							<label for="autoTradeTimeDelay">Delay: </label>
-							<input id="autoTradeTimeDelay" ng-model="trade.autoData.autoTradeTimeDelay" placeholder="0s" type="text" place-holder="0s" disabled>
-						</div>
+						<label for="autoTradeTimeDelay">Delay: </label>
+						<input id="autoTradeTimeDelay" ng-model="trade.autoData.autoTradeTimeDelay" placeholder="0s" type="text" place-holder="0s" disabled>
+					</div>
 				</div>
 
 				<div class="col-md-4 trade-control">
 					<div class="col-md-12 form-group">
 						<label for="autoTBuy">T-Buy: </label>
-						<input id="autoTBuy" ng-model="trade.autoData.autoTBuy" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0" required>
+						<input id="autoTBuy" ng-init="trade.autoData.autoTBuy=0" ng-model="trade.autoData.autoTBuy" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0" required>
 					</div>
 					<div class="col-md-12 form-group">
 						<label for="autoTSell">T-Sell: </label>
-						<input id="autoTSell" ng-model="trade.autoData.autoTSell" type="number" ng-disabled="trade.isConfirm" step="any" max="0" placeholder="0" required>
+						<input id="autoTSell" ng-init="trade.autoData.autoTSell=0" ng-model="trade.autoData.autoTSell" type="number" ng-disabled="trade.isConfirm" step="any" max="0" placeholder="0" required>
 					</div>
 				</div>
 			</div>
@@ -171,6 +171,7 @@
 						<span>Stop</span>
 					</button>
 				</div>
+				
 			</div>
 
 			<div class="col-md-12 trade-control">
@@ -179,6 +180,12 @@
 				</div>
 			</div>
 		</form>
+
+		<!-- <div class="col-md-4" >
+				<button class="btn btn-danger" ng-click="trade._testSellLimit()">
+					<span>Test</span>
+				</button>
+			</div> -->
 	</div>
 
 	<div class="col-md-12 log-area">
