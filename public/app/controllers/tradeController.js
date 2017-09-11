@@ -107,7 +107,6 @@ angular.module('tradeCtrl', ['tradeService'])
 							}
 						}
 					}
-
 				}
 			}
 		};
@@ -131,6 +130,9 @@ angular.module('tradeCtrl', ['tradeService'])
 					TradeService.sellLimit2(reqMarketName, reqQuantity)
 						.then(function (data) {
 							vm.autoData.autoTempBalance -= data.data.totalSuccess;
+							if(vm.autoData.autoTempBalance < 0) {
+								vm.autoData.autoTempBalance = 0;
+							}
 							vm.tradeLog += data.data.message;
 							$timeout(autoTrade, 1000);
 						});

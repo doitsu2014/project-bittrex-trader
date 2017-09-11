@@ -304,7 +304,7 @@ module.exports = function (app, express) {
 								if (err) {
 									// baseQuantity -= Number.parseFloat(item.Rate) * goodQuantity;
 									resultMes += `Sell: q_${baseQuantity} --- r_${item.Rate} --- m_${err.message}\n`;
-									totalFail += baseQuantity;									
+									totalFail += baseQuantity * item.Rate;									
 									baseQuantity -= item.Quantity;
 									return res.json({
 										success: false,
@@ -314,7 +314,7 @@ module.exports = function (app, express) {
 									});
 								} else {
 									resultMes += `Sell: q_${baseQuantity} --- r_${item.Rate} --- m_Success\n`;
-									totalSuccess += item.Quantity;
+									totalSuccess += baseQuantity * item.Rate;
 									baseQuantity -= item.Quantity;
 									return res.json({
 										success: "true",
@@ -334,7 +334,7 @@ module.exports = function (app, express) {
 								if (err) {
 									// return res.json({success:false, message: err});
 									resultMes += `Sell: q_${item.Quantity} --- r_${item.Rate} --- m_${err.message}\n`;
-									totalFail += baseQuantity;
+									totalFail += item.Quantity * item.Rate;
 									baseQuantity -= item.Quantity;
 									if (countLoop === ordersBook.length-1) {
 										return res.json({
@@ -349,7 +349,7 @@ module.exports = function (app, express) {
 									}
 								} else {
 									resultMes += `Sell: q_${item.Quantity} --- r_${item.Rate} --- m_Success}\n`;
-									totalSuccess += item.Quantity;									
+									totalSuccess += item.Quantity * item.Rate;									
 									baseQuantity -= item.Quantity;
 									if (countLoop === ordersBook.length-1) {
 										return res.json({
