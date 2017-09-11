@@ -94,12 +94,12 @@
 				</div>
 				<div class="col-md-4 trade-control">
 					<div class="col-md-12 form-group">
-						<label for="autoTempBalance">Temp Balance {{trade.currentMarket.MarketName.split('-')[1]}}: </label>
+						<label for="autoTempBalance">Temp Balance {{trade.currentMarket.MarketName.split('-')[0]}}: </label>
 						<input id="autoTempBalance" ng-model="trade.autoData.autoTempBalance" type="number" ng-disabled="true" step="any" min="0"
 						    placeholder="0" ng-init="trade.autoData.autoTempBalance=0" required>
 					</div>
 					<div class="col-md-12 form-group">
-						<label for="autoLimitCoin2">Limit {{trade.currentMarket.MarketName.split('-')[1]}}: </label>
+						<label for="autoLimitCoin2">Limit {{trade.currentMarket.MarketName.split('-')[0]}}: </label>
 						<input id="autoLimitCoin2" ng-init="trade.autoData.autoLimitCoin2=0" ng-model="trade.autoData.autoLimitCoin2" type="number"
 						    ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0" required>
 					</div>
