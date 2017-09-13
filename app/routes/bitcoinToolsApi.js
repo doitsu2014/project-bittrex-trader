@@ -33,6 +33,39 @@ module.exports = function (app, express) {
 		}
 	});
 
+	apiRouter.route('/marketsummaries')
+		.post(function (req, res) {
+			bittrex.getmarketsummaries(function (data, err) {
+				if (err) {
+					return res.json({
+						success: false,
+						message: err
+					})
+				}
+				res.json({
+					markets: (data.result.filter(m => m.MarketName.includes(req.body.marketType)))
+				});
+			});
+		});
+
+	apiRouter.route('/marketsummary')
+		.post(function (req, res) {
+			bittrex.getmarketsummary({
+				market: req.body.marketName
+			}, function (data, err) {
+				if (err) {
+					console.log("Response Err: ");
+					return res.json({
+						success: false,
+						message: err
+					});
+				}
+				res.json({
+					market: data.result
+				});
+			});
+		});
+
 	apiRouter.use(function (req, res, next) {
 		var doitsuSecret = config.secret;
 		var token = req.body.token || req.params.token || req.headers['x-access-token'];
@@ -57,38 +90,7 @@ module.exports = function (app, express) {
 		}
 	});
 
-	apiRouter.route('/marketsummaries')
-		.post(function (req, res) {
-			bittrex.getmarketsummaries(function (data, err) {
-				if (err) {
-					return res.json({
-						success: false,
-						message: err
-					})
-				}
-				res.json({
-					markets: (data.result.filter(m => m.MarketName.includes(req.body.marketType)))
-				});
-			})
-		});
-
-	apiRouter.route('/marketsummary')
-		.post(function (req, res) {
-			bittrex.getmarketsummary({
-				market: req.body.marketName
-			}, function (data, err) {
-				if (err) {
-					console.log("Response Err: ");
-					return res.json({
-						success: false,
-						message: err
-					});
-				}
-				res.json({
-					market: data.result
-				});
-			});
-		});
+	
 
 	apiRouter.route('/markets/buylimit')
 		.post(function (req, res) {
@@ -161,7 +163,7 @@ module.exports = function (app, express) {
 				if(baseQuantity <= 0) {
 					return res.json({
 						success: false,
-						message: "You buy 0 so you buy nothing",
+						message: "You buy 0 so you buy nothing\n",
 						totalSuccess: 0,
 						totalFail: 0
 					});
@@ -280,7 +282,7 @@ module.exports = function (app, express) {
 				if(baseQuantity <= 0) {
 					return res.json({
 						success: false,
-						message: "You sell 0 so you buy nothing",
+						message: "Your SELL balance is insufficiency\n",
 						totalSuccess: 0,
 						totalFail: 0
 					});
@@ -333,7 +335,7 @@ module.exports = function (app, express) {
 							}, function (data, err) {
 								if (err) {
 									// return res.json({success:false, message: err});
-									resultMes += `Sell: q_${item.Quantity} --- r_${item.Rate} --- m_${err.message}\n`;
+									resultMes += `Sell: q_${item.Quantity} -	-- r_${item.Rate} --- m_${err.message}\n`;
 									totalFail += item.Quantity * item.Rate;
 									baseQuantity -= item.Quantity;
 									if (countLoop === ordersBook.length-1) {

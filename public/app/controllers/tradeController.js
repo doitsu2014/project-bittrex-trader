@@ -44,9 +44,9 @@ angular.module('tradeCtrl', ['tradeService'])
 			if (!vm.dangerFormAuto) {
 				alert(`
 				-- Market Name: ${vm.currentMarket.MarketName} 
-				-- Limit Coin 1: ${vm.autoData.autoLimitCoin1} 
-				-- Limit Coin 2: ${vm.autoData.autoLimitCoin1} 
-				-- Base Price Time ${vm.autoData.basePriceTime} 
+				-- Limit Coin 2: ${vm.autoData.autoLimitCoin2}
+				-- Live Time: ${vm.autoData.basePriceTime}
+				-- Trade Time: ${vm.autoData.autoTradeTime}
 				-- T-Buy ${vm.autoData.autoTBuy} 
 				-- T-Sell ${vm.autoData.autoTSell}
 				`);
@@ -59,14 +59,18 @@ angular.module('tradeCtrl', ['tradeService'])
 			if (vm.isConfirm) {
 				vm.isStartAutos = false;
 				vm.isConfirm = false;
+				vm.autoData.autoData.autoTempBalance = 0;
+				vm.autoData.autoData.autoLimitCoin2 = 0;
 			}
 		};
 
 		vm.startAutos = function () {
 			vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
 			vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
-			vm.autoData.autoPrice = vm.currentMarket.Bid;
+			vm.autoData.autoPriceBid = vm.currentMarket.Bid;
+			vm.autoData.autoPriceAsk = vm.currentMarket.Ask;			
 			vm.autoData.autoBasePrice = vm.currentMarket.Bid;
+			vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;			
 			vm.isStartAutos = true;
 			autoBasePrice();
 			autoTrade();
@@ -113,7 +117,7 @@ angular.module('tradeCtrl', ['tradeService'])
 
 		var buyLimit = function () {
 			var reqMarketName = vm.currentMarket.MarketName;
-			var reqQuantity = vm.autoData.autoLimitCoin2;
+			var reqQuantity = vm.autoData.autoLimitCoin2 - vm.autoData.autoTempBalance;
 			TradeService.buyLimit2(reqMarketName, reqQuantity)
 				.then(function (data) {
 					vm.autoData.autoTempBalance += data.data.totalSuccess;
@@ -140,31 +144,33 @@ angular.module('tradeCtrl', ['tradeService'])
 		};
 		// this function will return type of trade
 		var checkConditions = function () {
-			var x = vm.autoData.autoPrice - vm.autoData.autoBasePrice;
-			if (x > 0) {
+			var x = vm.autoData.autoPriceBid - vm.autoData.autoBasePrice;
+			var y = vm.autoData.autoPriceAsk - vm.autoData.autoBasePriceAsk;
+			if (y < 0) {
+				if (y <= vm.autoData.autoTSell) {
+					return Constants.TypeOfTrade.sell;
+				} 
+			} else if (x > 0) {
 				if (x > vm.autoData.autoTBuy) {
 					return Constants.TypeOfTrade.buy;
-				} else {
-					return Constants.TypeOfTrade.doNothing;
 				}
 			} else {
-				if (x <= vm.autoData.autoTSell) {
-					return Constants.TypeOfTrade.sell;
-				} else {
-					return Constants.TypeOfTrade.doNothing;
-				}
+				return Constants.TypeOfTrade.doNothing;
 			}
-		}
+		};
 
 		var autoBasePrice = () => {
 			if (vm.isConfirm) {
 				if (vm.isStartAutos) {
 					if (vm.autoData.basePriceTimeDelay != 0) {
 						vm.autoData.basePriceTimeDelay -= 1;
-						vm.autoData.autoPrice = vm.currentMarket.Bid;
+						vm.autoData.autoPriceBid = vm.currentMarket.Bid;
+						vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
 					} else {
-						vm.autoData.autoPrice = vm.currentMarket.Bid;
+						vm.autoData.autoPriceBid = vm.currentMarket.Bid;
+						vm.autoData.autoPriceAsk = vm.currentMarket.Ask;						
 						vm.autoData.autoBasePrice = vm.currentMarket.Bid;
+						vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;
 						vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
 					}
 					$timeout(autoBasePrice, 1000);
@@ -185,6 +191,8 @@ angular.module('tradeCtrl', ['tradeService'])
 			var result = "";
 			result += basePriceTimeRegExp.test(vm.autoData.basePriceTime) ? "" : "Base Price Time is not valid--";
 			result += tradeTimeRegExp.test(vm.autoData.autoTradeTime) ? "" : "Trade Time is not valid";
+			result += Number.parseFloat(vm.autoData.autoTBuy) != 0 ? "" : "T-Buy should not 0 value.";
+			result += Number.parseFloat(vm.autoData.autoTSell) != 0 ? "" : "T-Sell should not 0 value.";
 			return result;
 		};
 
