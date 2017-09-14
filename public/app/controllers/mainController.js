@@ -14,6 +14,7 @@ angular.module('mainCtrl', ['authService'])
             Auth.login(vm.dataLogin.userKey, vm.dataLogin.userSecret)
                 .then(function (data) {
                     if (data.data.success) {
+                        $window.location.reload();
                         $location.path('/trading');
                     } else {
                         vm.error = data.data.message;
