@@ -33,6 +33,32 @@ module.exports = function (app, express) {
 		}
 	});
 
+
+
+	apiRouter.use(function (req, res, next) {
+		var doitsuSecret = config.secret;
+		var token = req.body.token || req.params.token || req.headers['x-access-token'];
+		if (token) {
+			jsonwebtoken.verify(token, doitsuSecret, function (err, decoded) {
+				if (err) {
+					return res.json({
+						success: false,
+						message: 'failed to authenticate token'
+					});
+				} else {
+					req.decoded = decoded;
+					next();
+				}
+			});
+		} else {
+			console.log("Bad Token");
+			return res.status(403).send({
+				success: false,
+				message: 'No token provided'
+			});
+		}
+	});
+
 	apiRouter.route('/marketsummaries')
 		.post(function (req, res) {
 			bittrex.getmarketsummaries(function (data, err) {
@@ -65,32 +91,6 @@ module.exports = function (app, express) {
 				});
 			});
 		});
-
-	apiRouter.use(function (req, res, next) {
-		var doitsuSecret = config.secret;
-		var token = req.body.token || req.params.token || req.headers['x-access-token'];
-		if (token) {
-			jsonwebtoken.verify(token, doitsuSecret, function (err, decoded) {
-				if (err) {
-					return res.json({
-						success: false,
-						message: 'failed to authenticate token'
-					});
-				} else {
-					req.decoded = decoded;
-					next();
-				}
-			});
-		} else {
-			console.log("Bad Token");
-			return res.status(403).send({
-				success: false,
-				message: 'No token provided'
-			});
-		}
-	});
-
-	
 
 	apiRouter.route('/markets/buylimit')
 		.post(function (req, res) {
@@ -160,7 +160,7 @@ module.exports = function (app, express) {
 				// orders book here
 				var ordersBook = data.result;
 				var baseQuantity = Number.parseFloat(reqQuantity);
-				if(baseQuantity <= 0) {
+				if (baseQuantity <= 0) {
 					return res.json({
 						success: false,
 						message: "You buy 0 so you buy nothing\n",
@@ -177,7 +177,7 @@ module.exports = function (app, express) {
 					// good quantity, you have to pay
 					// base quantity in buy action is the left side of market, 
 					// so we have to convert it to right side that action help us to pass a good quantity to action buy
-					var goodQuantity =	baseQuantity / item.Rate;
+					var goodQuantity = baseQuantity / item.Rate;
 					if (goodQuantity > 0) {
 						if (goodQuantity <= item.Quantity) {
 							// buy all good quantity
@@ -189,7 +189,7 @@ module.exports = function (app, express) {
 								if (err) {
 									// end of buy cycle you buy all base quantity
 									resultMes += `Buy: q_${goodQuantity} --- r_${item.Rate} --- m_${err.message}\n`;
-									totalFail+= baseQuantity;
+									totalFail += baseQuantity;
 									baseQuantity -= item.Quantity * item.Rate;
 									return res.json({
 										success: false,
@@ -199,13 +199,13 @@ module.exports = function (app, express) {
 									});
 								} else {
 									resultMes += `Buy: q_${goodQuantity} --- r_${item.Rate} --- m_Success\n`;
-									totalSuccess += baseQuantity;									
+									totalSuccess += baseQuantity;
 									baseQuantity -= item.Quantity * item.Rate;
 									return res.json({
 										success: "true",
 										message: resultMes,
 										totalSuccess: totalSuccess,
-										totalFail: totalFail										
+										totalFail: totalFail
 									});
 								}
 							});
@@ -219,10 +219,10 @@ module.exports = function (app, express) {
 								if (err) {
 									// return res.json({success:false, message: err});
 									resultMes += `Buy: q_${item.Quantity} --- r_${item.Rate} --- m_${err.message}\n`;
-									totalFail += item.Quantity * item.Rate;									
+									totalFail += item.Quantity * item.Rate;
 									baseQuantity -= item.Quantity * item.Rate;
 									//if end of loop => return directly
-									if (countLoop === ordersBook.length-1) {
+									if (countLoop === ordersBook.length - 1) {
 										return res.json({
 											success: false,
 											message: resultMes,
@@ -235,10 +235,10 @@ module.exports = function (app, express) {
 									}
 								} else {
 									resultMes += `Buy: q_${item.Quantity} --- r_${item.Rate} --- m_Success}\n`;
-									totalSuccess += item.Quantity * item.Rate;								
+									totalSuccess += item.Quantity * item.Rate;
 									baseQuantity -= item.Quantity * item.Rate;
 									//if end of loop => return directly
-									if (countLoop === ordersBook.length-1) {
+									if (countLoop === ordersBook.length - 1) {
 										return res.json({
 											success: true,
 											message: resultMes,
@@ -279,7 +279,7 @@ module.exports = function (app, express) {
 				// orders book here
 				var ordersBook = data.result;
 				var baseQuantity = Number.parseFloat(reqQuantity);
-				if(baseQuantity <= 0) {
+				if (baseQuantity <= 0) {
 					return res.json({
 						success: false,
 						message: "Your SELL balance is insufficiency\n",
@@ -306,7 +306,7 @@ module.exports = function (app, express) {
 								if (err) {
 									// baseQuantity -= Number.parseFloat(item.Rate) * goodQuantity;
 									resultMes += `Sell: q_${baseQuantity} --- r_${item.Rate} --- m_${err.message}\n`;
-									totalFail += baseQuantity * item.Rate;									
+									totalFail += baseQuantity * item.Rate;
 									baseQuantity -= item.Quantity;
 									return res.json({
 										success: false,
@@ -322,7 +322,7 @@ module.exports = function (app, express) {
 										success: "true",
 										message: resultMes,
 										totalSuccess: totalSuccess,
-										totalFail: totalFail										
+										totalFail: totalFail
 									});
 								}
 							});
@@ -338,7 +338,7 @@ module.exports = function (app, express) {
 									resultMes += `Sell: q_${item.Quantity} -	-- r_${item.Rate} --- m_${err.message}\n`;
 									totalFail += item.Quantity * item.Rate;
 									baseQuantity -= item.Quantity;
-									if (countLoop === ordersBook.length-1) {
+									if (countLoop === ordersBook.length - 1) {
 										return res.json({
 											success: false,
 											message: resultMes,
@@ -351,9 +351,9 @@ module.exports = function (app, express) {
 									}
 								} else {
 									resultMes += `Sell: q_${item.Quantity} --- r_${item.Rate} --- m_Success}\n`;
-									totalSuccess += item.Quantity * item.Rate;									
+									totalSuccess += item.Quantity * item.Rate;
 									baseQuantity -= item.Quantity;
-									if (countLoop === ordersBook.length-1) {
+									if (countLoop === ordersBook.length - 1) {
 										return res.json({
 											success: true,
 											message: resultMes,
