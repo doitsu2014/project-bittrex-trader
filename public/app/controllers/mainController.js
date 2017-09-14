@@ -1,5 +1,5 @@
 angular.module('mainCtrl', ['authService'])
-    .controller('MainController', function ($scope, $location, Auth) {
+    .controller('MainController', function ($scope, $location,$window, Auth) {
         var vm = this;
         $scope.$on('$routeChangeStart', function () {
             vm.loggedIn = Auth.isLoggedIn();
@@ -14,7 +14,7 @@ angular.module('mainCtrl', ['authService'])
             Auth.login(vm.dataLogin.userKey, vm.dataLogin.userSecret)
                 .then(function (data) {
                     if (data.data.success) {
-                        $location.path('/');
+                        $location.path('/trading');
                     } else {
                         vm.error = data.data.message;
                     }
@@ -25,7 +25,8 @@ angular.module('mainCtrl', ['authService'])
         vm.doLogout = function () {
             Auth.logout();
             vm.user = null;
-            $location.path('/login');
-        }
+            $window.location.reload();
+            $location.path('/');
+        };
         return vm;
     })
