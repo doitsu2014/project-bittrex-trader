@@ -9,6 +9,11 @@ angular.module('tradeCtrl', ['tradeService'])
 	.controller('TradeController', function ($scope, $timeout, $interval, $location, $q, TradeService, Constants) {
 		var vm = this;
 		var tradeUrl = $location.path();
+
+		(() => {
+			TradeService.getBalance("ÚSDT");
+		})();
+
 		TradeService.getMarkets(vm.marketType || 'USDT-')
 			.then(function (data) {
 				vm.Markets = data;

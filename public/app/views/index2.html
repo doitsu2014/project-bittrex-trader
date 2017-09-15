@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<link rel="apple-touch-icon" sizes="76x76" href="assets/img/apple-icon.png">
+	<link rel="icon" type="image/png" href="assets/img/favicon.png">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<title>Doitsu Bitcoin Tools</title>
+	<base href="/">
+	<!-- Bootstrap CSS -->
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+
+	<!--     Fonts and icons     -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+
+	<!-- CSS Files -->
+	<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="assets/css/material-kit.css" rel="stylesheet" />
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-route.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-animate.js"></script>
+
+
+	<script src="app/controllers/homeController.js"></script>
+	<script src="app/services/homeService.js"></script>
+	<script src="app/controllers/tradeController.js"></script>
+	<script src="app/services/tradeService.js"></script>
+	<script src="app/controllers/mainController.js"></script>
+	<script src="app/services/authService.js"></script>
+	<script src="app/app.router.js"></script>
+	<script src="app/app.js"></script>
+
+
+	<style>
+		.modal-body .form-control {
+			color: #fff;
+		}
+	</style>
+</head>
+
+<body ng-app="userApp" ng-controller="MainController as main" class="landing-page">
+	<nav class="navbar navbar-transparent navbar-absolute">
+		<div class="container">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+				<a class="navbar-brand" href="#"><img src="assets/images/bitcoin-logo.png" width="50px" height="50px" alt=""></a>
+			</div>
+
+			<div class="collapse navbar-collapse" id="navigation-example">
+				<ul class="nav navbar-nav navbar-left">
+					<li><a href="/">Home</a></li>
+					<li ng-if="main.user"><a href="/trading">Trade Area</a></li>
+					<li><a href="/aboutme">About me</a></li>
+				</ul>
+
+				<ul class="nav navbar-nav navbar-right">
+					<li ng-if="!main.user"><a href="#" data-toggle="modal" data-target="#loginModal">Login</a></li>
+					<li ng-if="main.user"><a href="#"><b>Key: {{main.user}}</b></a></li>
+					<li ng-if="main.user"><a href="#" ng-click="main.doLogout()">Logout</a></li>
+
+				</ul>
+			</div>
+
+
+		</div>
+	</nav>
+
+	<!-- Modal Login -->
+	<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content" style="background-color: rgba(0,0,0,0.9);">
+				<div class="modal-header text-center">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel" style="color: #fff;"><b>Welcome to Solji Trade  </b><img src="assets/images/welcome.png" alt="" width="50px" height="50px"> </h4>
+				</div>
+				<form ng-submit="main.doLogin()">
+					<div class="modal-body" style="padding-top: 0px;">
+						<div class="form-group label-floating">
+							<label class="control-label">Key API</label>
+							<input type="text" class="form-control" id="userKey" ng-model="main.dataLogin.userKey">
+						</div>
+						<div class="form-group label-floating">
+							<label class="control-label">Secret API</label>
+							<input type="text" class="form-control" id="userSecret" ng-model="main.dataLogin.userSecret">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-primary" type="submit">Login</button>
+						<button class="btn btn-danger" data-dismiss="modal">Close</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="wrapper">
+		<div class="header header-filter" style="background-image: url('assets/images/citymidnight.png');">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-6">
+						<h1 class="title">Solji Trade Bitcoin Tool</h1>
+						<h4>Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi quia nesciunt ipsum. Commodi, vel necessitatibus laudantium
+							totam voluptatem voluptatum consequuntur repellendus culpa laboriosam asperiores consequatur, natus architecto ab
+							in ex! </h4>
+						<br />
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="main main-raised">
+			<div class="container">
+
+				<div class="section col-md-12 text-center section-landing" ng-view="">
+
+				</div>
+
+				<div class="section text-center section-landing">
+					<div class="row">
+						<div class="col-md-8 col-md-offset-2">
+							<h2 class="title">Introduction</h2>
+							<h5 class="description">Hướng dẫn sử dụng tool</h5>
+						</div>
+					</div>
+
+					<div class="features">
+						<div class="row">
+							<div class="col-md-4">
+								<div class="info">
+									<div class="icon icon-primary">
+										<i class="material-icons">chat</i>
+									</div>
+									<h4 class="info-title">First Feature</h4>
+									<p>Divide details about your product or agency work into parts. Write a few lines about each one. A paragraph describing
+										a feature will be enough.</p>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="info">
+									<div class="icon icon-success">
+										<i class="material-icons">verified_user</i>
+									</div>
+									<h4 class="info-title">Second Feature</h4>
+									<p>Divide details about your product or agency work into parts. Write a few lines about each one. A paragraph describing
+										a feature will be enough.</p>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="info">
+									<div class="icon icon-danger">
+										<i class="material-icons">fingerprint</i>
+									</div>
+									<h4 class="info-title">Third Feature</h4>
+									<p>Divide details about your product or agency work into parts. Write a few lines about each one. A paragraph describing
+										a feature will be enough.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="section text-center">
+					<h2 class="title">Here is our team</h2>
+					<div class="team">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="team-player">
+									<img src="assets/images/avatars/ducth.jpg" alt="Thumbnail Image" class="img-raised img-circle">
+									<h4 class="title">Đức Trần Hữu<br />
+										<small class="text-muted">Developer</small>
+									</h4>
+									<p class="description"> Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum laudantium modi ea ipsam amet nisi exercitationem?
+										Inventore quis hic rerum repellendus tempora doloribus odit, perspiciatis facilis tempore voluptatem voluptas magnam!Corrupti
+										voluptatum temporibus saepe inventore culpa ex deserunt voluptates, dicta obcaecati blanditiis tenetur corporis
+										dolor eveniet facere quas iusto ea nesciunt quisquam ipsam aspernatur voluptatibus? Rem obcaecati cumque ducimus
+										voluptatibus. </p>
+									<a href="https://www.facebook.com/doitsu2014" class="btn btn-simple btn-just-icon btn-default"><i class="fa fa-facebook-square"></i></a>
+									<a href="https://www.instagram.com/thd1461996/" class="btn btn-simple btn-just-icon"><i class="fa fa-instagram"></i></a>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="team-player">
+									<img src="assets/images/avatars/tuann.jpg" alt="Thumbnail Image" class="img-raised img-circle">
+									<h4 class="title">Tuấn Nguyễn<br />
+										<small class="text-muted">Manager</small>
+									</h4>
+									<p class="description"> Lorem ipsum dolor, sit amet consectetur adipisicing elit. Porro dolores beatae magnam ratione, qui pariatur tempore
+										fugit quasi veritatis officiis temporibus nobis cupiditate suscipit amet molestiae minus. Dolorum, mollitia dicta!Ea
+										rem molestias, qui neque delectus facilis maxime alias quod nobis tempora, impedit nostrum quos officia earum deleniti
+										sequi quibusdam error illum nam porro in aspernatur praesentium aliquid pariatur? Ducimus!</p>
+									<a href="https://www.facebook.com/boybungbu" class="btn btn-simple btn-just-icon"><i class="fa fa-facebook-square"></i></a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<footer class="footer">
+			<div class="container">
+				<nav class="pull-left">
+					<ul>
+						<li>
+							<a href="http://www.creative-tim.com">
+								  Doitsu2014
+								</a>
+						</li>
+						<li>
+							<a href="http://presentation.creative-tim.com">
+								   About Us
+								</a>
+						</li>
+						<li>
+							<a href="http://blog.creative-tim.com">
+								   Blog
+								</a>
+						</li>
+						<li>
+							<a href="http://www.creative-tim.com/license">
+									Licenses
+								</a>
+						</li>
+					</ul>
+				</nav>
+				<div class="copyright pull-right">
+					&copy; 2017, made with <i class="fa fa-heart heart"></i> by Doitsu2014
+				</div>
+			</div>
+		</footer>
+
+	</div>
+	<!-- <div class="col-lg-10 col-md-offset-1 main-views" ng-view>
+
+	</div> -->
+
+	<!-- jQuery -->
+	<!-- Bootstrap JavaScript -->
+
+	<!--   Core JS Files   -->
+	<script src="assets/js/jquery.min.js" type="text/javascript"></script>
+	<script src="assets/js/bootstrap.min.js" type="text/javascript"></script>
+	<script src="assets/js/material.min.js"></script>
+
+	<!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+	<script src="assets/js/nouislider.min.js" type="text/javascript"></script>
+
+	<!--  Plugin for the Datepicker, full documentation here: http://www.eyecon.ro/bootstrap-datepicker/ -->
+	<script src="assets/js/bootstrap-datepicker.js" type="text/javascript"></script>
+
+	<!-- Control Center for Material Kit: activating the ripples, parallax effects, scripts from the example pages etc -->
+	<script src="assets/js/material-kit.js" type="text/javascript"></script>
+</body>
+
+</html>

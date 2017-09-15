@@ -69,7 +69,7 @@ angular.module('authService', [])
                 config.headers['x-access-token'] = token;
             }
             return config;
-        }
+        };
         //redirect if a token doesn't authenticated
         interceptorFactory.responseError = (response) => {
             if (response.status === 403) {

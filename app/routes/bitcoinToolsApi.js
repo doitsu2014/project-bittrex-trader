@@ -34,31 +34,6 @@ module.exports = function (app, express) {
 	});
 
 
-
-	apiRouter.use(function (req, res, next) {
-		var doitsuSecret = config.secret;
-		var token = req.body.token || req.params.token || req.headers['x-access-token'];
-		if (token) {
-			jsonwebtoken.verify(token, doitsuSecret, function (err, decoded) {
-				if (err) {
-					return res.json({
-						success: false,
-						message: 'failed to authenticate token'
-					});
-				} else {
-					req.decoded = decoded;
-					next();
-				}
-			});
-		} else {
-			console.log("Bad Token");
-			return res.status(403).send({
-				success: false,
-				message: 'No token provided'
-			});
-		}
-	});
-
 	apiRouter.route('/marketsummaries')
 		.post(function (req, res) {
 			bittrex.getmarketsummaries(function (data, err) {
@@ -92,6 +67,31 @@ module.exports = function (app, express) {
 			});
 		});
 
+
+
+	apiRouter.use(function (req, res, next) {
+		var doitsuSecret = config.secret;
+		var token = req.body.token || req.params.token || req.headers['x-access-token'];
+		if (token) {
+			jsonwebtoken.verify(token, doitsuSecret, function (err, decoded) {
+				if (err) {
+					return res.json({
+						success: false,
+						message: 'failed to authenticate token'
+					});
+				} else {
+					req.decoded = decoded;
+					next();
+				}
+			});
+		} else {
+			console.log("Bad Token");
+			return res.status(403).send({
+				success: false,
+				message: 'No token provided'
+			});
+		}
+	});
 	apiRouter.route('/markets/buylimit')
 		.post(function (req, res) {
 			bittrex.options({
