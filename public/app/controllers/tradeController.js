@@ -206,4 +206,15 @@ angular.module('tradeCtrl', ['tradeService'])
 			var result = parseInt(elements[0] * 3600) + parseInt(elements[1] * 60) + parseInt(elements[2]);
 			return result;
 		};
+
+
+		vm.showLogsPopup = () => {
+			var popup = angular.element( document.querySelector( '.cd-tradelogs-popup' ) );
+			popup.addClass('is-visible');
+		}
+
+		vm.stopLogsPopup = () => {
+			var popup = angular.element( document.querySelector( '.cd-tradelogs-popup' ) );
+			popup.removeClass('is-visible');
+		}
 	});

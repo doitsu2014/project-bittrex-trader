@@ -1,30 +1,52 @@
 jQuery(document).ready(function($){
+	/// LOGIN POPUP
 	//open popup
-	$('.cd-popup-trigger').on('click', function(event){
+	$('.cd-login-popup-trigger').on('click', function(event){
 		event.preventDefault();
-		$('.cd-popup').addClass('is-visible');
+		$('.cd-login-popup').addClass('is-visible');
 	});
 	
 	//close popup
-	$('.cd-popup').on('click', function(event){
-		if( $(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
+	$('.cd-login-popup').on('click', function(event){
+		if( $(event.target).is('.cd-login-popup-close') || $(event.target).is('.cd-login-popup')) {
 			event.preventDefault();
 			$(this).removeClass('is-visible');
 		}
 	});
 
 	//close popup customize
-	$('.cd-popup').on('click', function(event){
+	$('.cd-login-popup').on('click', function(event){
 		if($(event.target).is('.buttom-confirm')) {
 			$(this).removeClass('is-visible');
 		}
 	});
 	
+	/// ABOUT ME POPUP
+	//open popup
+	$('.cd-aboutme-popup-trigger').on('click', function(event){
+		event.preventDefault();
+		$('.cd-aboutme-popup').addClass('is-visible');
+	});
+	
+	//close popup
+	$('.cd-aboutme-popup').on('click', function(event){
+		if( $(event.target).is('.cd-aboutme-popup-close') || $(event.target).is('.cd-aboutme-popup')) {
+			event.preventDefault();
+			$(this).removeClass('is-visible');
+		}
+	});
+
+	// LOGS POPUP
+	
+
+
 	//close popup when clicking the esc keyboard button
 	$(document).keyup(function(event){
     	if(event.which=='27'){
-    		$('.cd-popup').removeClass('is-visible');
+			$('.cd-login-popup').removeClass('is-visible');
+    		$('.cd-aboutme-popup').removeClass('is-visible');
+    		$('.cd-tradelogs-popup').removeClass('is-visible');
+			
 	    }
-    });
-	
+	});
 });

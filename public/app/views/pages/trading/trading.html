@@ -1,10 +1,7 @@
 <style>
 	.trade-area {
-		padding-top:2em;
+		padding-top: 2em;
 		padding-bottom: 2em;
-			
-		border: 1px solid #000;
-		border-radius: 10px;
 		margin-bottom: 2em;
 	}
 
@@ -16,38 +13,74 @@
 		padding-bottom: 2em;
 	}
 
-	
 	input {
 		width: 100%;
-		font-size: 1.3em;
+		background-color: rgba(0, 0, 0, 0);
+		color: white;
+		height: 40px;
+		line-height: 40px;
+		margin: 10px 0px 0px 0px;
+		padding: 0px 0px 0px 10px;
+		border: 1px solid #c979ff;
 	}
 
 	select {
 		width: 100%;
-		font-size: 1.3em;
+		background-color: rgba(0, 0, 0, 0);
+		color: #a004a0;
+		height: 40px;
+		line-height: 40px;
+		margin: 10px 0px 0px 0px;
+		padding: 0px 0px 0px 10px;
+		border: 1px solid #6bffc8;
+	}
+
+	select:active,
+	select:focus {
+		outline: none;
+	}
+
+	select option:hover {
+		color: #000;
+		box-shadow: inset 20px 20px #00f;
 	}
 
 	.btn {
 		width: 100%;
+		font-weight: bold;
+		padding: 10px;
+		border-radius: 0px;
+		opacity: 0.85;
 	}
 
 	.log-area {
 		display: table;
+		width: 100%;
 		height: 100%;
 	}
 
 	.log-area>textarea,
 	.log-area>div {
 		display: table-row;
+		resize: none;
 		border: none;
 		/* if you keep border then textarea will go out of the parent element */
-		height: 700px;
+		height: 10em;
+		width: 100%;
 		/* hardcoded */
 		padding: 0px;
 		/* removing padding for chrome */
-		width: 100%;
-		color: white;
-		background-color: darkslategrey;
+		color: black;
+		background-color: rgba(132, 58, 230, 0.21);
+	}
+
+	.trade-area input:disabled,
+	input:disabled::placeholder {
+		color: #fff;
+	}
+
+	input[type=number]::-webkit-inner-spin-button {
+		opacity: 0;
 	}
 </style>
 
@@ -63,12 +96,14 @@
 					<th>Market Name</th>
 					<th>High</th>
 					<th>Low</th>
-					<th>Volume</th>
 					<th>Last</th>
-					<th>Base Volume</th>
 					<th>Bid</th>
 					<th>Ask</th>
-					<th>Time Stamp</th>
+					<!-- Hide some information no need to use tool
+					<th>Base Volume</th>
+					<th>Volume</th>
+					<th>Time Stamp</th> 
+					-->
 				</tr>
 			</thead>
 			<tbody>
@@ -76,12 +111,14 @@
 					<td>{{ trade.currentMarket.MarketName }}</td>
 					<td>{{ trade.currentMarket.High }}</td>
 					<td>{{ trade.currentMarket.Low }}</td>
-					<td>{{ trade.currentMarket.Volume }}</td>
 					<td>{{ trade.currentMarket.Last }}</td>
-					<td>{{ trade.currentMarket.BaseVolume }}</td>
 					<td>{{ trade.currentMarket.Bid }}</td>
 					<td>{{ trade.currentMarket.Ask }}</td>
+					<!-- Hide some information no need to use tool
+					<td>{{ trade.currentMarket.Volume }}</td>
+					<td>{{ trade.currentMarket.BaseVolume }}</td>
 					<td>{{ trade.currentMarket.TimeStamp }}</td>
+					-->
 				</tr>
 			</tbody>
 		</table>
@@ -94,9 +131,10 @@
 				<div class="col-md-8 trade-control">
 					<div class="col-md-12 form-group">
 						<label for="ddlMarketName">Select your market: </label>
-						<select id="ddlMarketName" class="" ng-model="trade.marketName" ng-disabled="trade.isConfirm" required="required">
-							<option value="{{trade.marketName}}">{{trade.marketName}}</option>
-							<option ng-repeat="market in trade.Markets" value="{{market.MarketName}}">{{market.MarketName}}</option>
+						<select id="ddlMarketName" class="" ng-init="trade.marketName='USDT'" ng-model="trade.marketName" ng-disabled="trade.isConfirm"
+						    required="required">
+							 <option value="{{trade.marketName}}">{{trade.marketName}}</option>
+							<option ng-repeat="market in trade.Markets"  value="{{market.MarketName}}">{{market.MarketName}}</option>
 						</select>
 					</div>
 				</div>
@@ -167,17 +205,22 @@
 			</div>
 
 			<div class="col-md-12 trade-control">
-				<div class="col-md-4">
+				<div class="col-md-3">
 					<button type="submit" class="btn btn-success" ng-disabled="trade.isConfirm">
 						<span>Confirm</span>
 					</button>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-3">
 					<button class="btn btn-primary" ng-click="trade.startAutos()" ng-disabled="!trade.isConfirm || trade.isStartAutos">
 						<span>Start</span>
 					</button>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-3">
+					<button class="btn btn-default cd-tradelogs-popup-trigger" type="button" ng-click="trade.showLogsPopup()">
+								<span>Show Trade Logs</span>
+							</button>
+				</div>
+				<div class="col-md-3">
 					<button class="btn btn-danger" ng-click="trade.stopAutos()" ng-disabled="!trade.isConfirm">
 						<span>Stop</span>
 					</button>
@@ -192,8 +235,18 @@
 			</div>
 		</form>
 	</div>
-	<div class="col-md-12 log-area">
-		<textarea name="" id="" cols="auto" rows="auto" disabled ng-model="trade.tradeLog"></textarea>
-	</div>
 
+
+	<div class="cd-popup cd-tradelogs-popup" role="alert">
+		<div class="cd-popup-container">
+			<div class="shadow-purple">
+				<div class="log-area">
+					<textarea name="" id="" cols="auto" rows="auto" disabled ng-model="trade.tradeLog"></textarea>
+				</div>
+			</div>
+			<a href="#0" class="cd-popup-close cd-tradelogs-popup-close img-replace" ng-click="trade.stopLogsPopup();">Close</a>
+		</div>
+		<!-- cd-tradelogs-popup-container -->
+	</div>
+	<!--  cd-tradelogs-popup -->
 </div>

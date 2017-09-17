@@ -38,7 +38,7 @@
 
 		.main-views {
 			margin-top:50px;
-			background-color: rgba(22, 5, 39, 0.8);
+			background-color: rgba(6, 0, 12, 0.8);
 			border-radius: 0.5em;
 			padding-top: 25px;
 			padding-bottom: 25px;
@@ -49,11 +49,18 @@
 
 		table tbody tr:nth-child(odd)
 		{
-			color: rgba(22, 5, 39, 0.8)
+			background-color:rgba(165, 67, 255, 0.19) !important;
+			color: rgb(255, 255, 255);
 		}
 
 		.jumbotron {
 			margin-top: 10px;
+		}
+		.table>thead>tr>th{
+			border-bottom: 3px solid #a542ff !important;
+		}
+		.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td{
+			border:none !important;
 		}
 	</style>
 </head>
@@ -70,20 +77,17 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-				<a href="/">
-                    <img src="assets/images/bitcoin-logo.png" style="width:50px; height:50px; border-radius: 20%" alt="">
-                </a>
 			</div>
 			<!-- Collect the nav links, forms, and other content for toggling -->
 			<div class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
 					<li><a href="/">Home</a></li>
 					<li ng-if="main.user"><a href="/trading">Trade Area</a></li>
-					<li><a href="/aboutme">About me</a></li>
+					<li class="cd-popup-trigger cd-aboutme-popup-trigger"><a href="#" >About me</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<ul class="nav navbar-nav navbar-right">
-						<li ng-if="!main.user"><a href="#" class="cd-popup-trigger">Login</a></li>
+						<li ng-if="!main.user"><a href="#" class="cd-popup-trigger cd-login-popup-trigger">Login</a></li>
 						<li ng-if="main.user"><a href="#"><b>Key: {{main.user}}</b></a></li>
 						<li ng-if="main.user"><a href="#" ng-click="main.doLogout()">Logout</a></li>
 					</ul>
@@ -93,7 +97,7 @@
 		</div>
 		<!-- /.container -->
 	</nav>
-	<div class="cd-popup" role="alert">
+	<div class="cd-popup cd-login-popup" role="alert">
 		<div class="cd-popup-container">
 			<div class="shadow-purple">
 				<form id="formLogin" ng-submit="main.doLogin()">
@@ -105,11 +109,24 @@
 					</div>
 				</form>
 			</div>
-			<a href="#0" class="cd-popup-close img-replace">Close</a>
+			<a href="#0" class="cd-popup-close cd-login-popup-close img-replace">Close</a>
 		</div>
-		<!-- cd-popup-container -->
+		<!-- cd-login-popup-container -->
 	</div>
-	<!-- cd-popup -->
+	<!--  cd-login-popup -->
+
+	
+	<div class="cd-popup cd-aboutme-popup" role="alert">
+		<div class="cd-popup-container">
+			<div class="shadow-purple">
+				<h2>About Me:</h2><br/>
+				<p>Dev: Doitsu is da best</p>
+			</div>
+			<a href="#0" class="cd-popup-close cd-aboutme-popup-close img-replace">Close</a>
+		</div>
+		<!-- cd-aboutme-popup-container -->
+	</div>
+	<!--  cd-aboutme-popup -->
 	<div class="col-lg-10 col-md-offset-1 main-views" ng-view>
 
 	</div>
