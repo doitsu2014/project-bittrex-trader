@@ -1,5 +1,6 @@
 angular.module('userApp', [
     'ngAnimate',
+    'ngSanitize',
     'authService',
     'mainCtrl',
     'homeService',

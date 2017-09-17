@@ -184,6 +184,12 @@
 	
 	.alert-danger{
 		background-color: rgba(0, 0, 0, 0);
+		color: #BE2B2B;
+		border: 1px solid #BE2B2B;
+	}
+	
+	.alert-success{
+		background-color: rgba(0, 0, 0, 0);
 		color: #00ff8b;
 		border: 1px solid #00ff8b;
 	}
@@ -303,14 +309,25 @@
 			</div>
 
 			<div class="col-md-12">
-				<div class="col-md-12 trade-control">
+				<div class="col-md-6 trade-control">
 					<div class="col-md-6 form-group">
-						<label for="autoPrice">Price: </label>
-						<input id="autoPrice" ng-model="trade.autoData.autoPrice" type="number" disabled step="any" min="0" placeholder="0" required>
+						<label for="autoPrice">Price Buy: </label>
+						<input id="autoPrice" ng-model="trade.autoData.autoPriceBid" type="number" disabled step="any" min="0" placeholder="0" required>
 					</div>
 					<div class="col-md-6 form-group">
-						<label for="autoBasePrice">Base Price: </label>
-						<input id="autoBasePrice" ng-model="trade.autoData.autoBasePrice" type="number" disabled step="any" min="0" placeholder="0"
+						<label for="autoBasePrice">Base Price Buy: </label>
+						<input id="autoBasePrice" ng-model="trade.autoData.autoBasePriceBid" type="number" disabled step="any" min="0" placeholder="0"
+						    required>
+					</div>
+				</div>
+				<div class="col-md-6 trade-control">
+					<div class="col-md-6 form-group">
+						<label for="autoPrice">Price Sell: </label>
+						<input id="autoPrice" ng-model="trade.autoData.autoPriceAsk" type="number" disabled step="any" min="0" placeholder="0" required>
+					</div>
+					<div class="col-md-6 form-group">
+						<label for="autoBasePrice">Base Price Sell: </label>
+						<input id="autoBasePrice" ng-model="trade.autoData.autoBasePriceAsk" type="number" disabled step="any" min="0" placeholder="0"
 						    required>
 					</div>
 				</div>
@@ -339,10 +356,14 @@
 				</div>
 
 			</div>
-
 			<div class="col-md-12 trade-control">
 				<div ng-if="trade.dangerFormAuto" class="alert alert-danger">
-					<strong>Dangerous!</strong> {{trade.dangerFormAuto}}
+					<strong>Dangerous!</strong><br/><br/> <span ng-bind-html="trade.dangerFormAuto"></span>
+				</div>
+			</div>
+			<div class="col-md-12 trade-control">
+				<div ng-if="trade.confirmMess" class="alert alert-success">
+					<strong>Success!</strong><br/><br/> <span ng-bind-html="trade.confirmMess"></span>
 				</div>
 			</div>
 		</form>
