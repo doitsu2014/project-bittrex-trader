@@ -1,10 +1,18 @@
+<style>
+	.form-control {
+		color: #ffffff;
+		background-color: rgba(36, 14, 59, 0.66);
+		border: 1px solid #a542ff;
+	}
+
+</style>
 <div class="row">
 	<div class="col-md-8 col-md-offset-2">
 		<h2 class="title"></h2>
 	</div>
 </div>
 <div class="row">
-	<div class="col-md-2">
+	<div class="col-md-2" style="margin:10px 0px 0px 0px;">
 		<b>Select your market type</b>
 		<select name="" ng-init="home.marketType='USDT-'" ng-model="home.marketType" ng-change="home.updateMarkets()" id="ddlMarketType"
 		    class="form-control col-md-3" required="required" style="margin-top:10px;">

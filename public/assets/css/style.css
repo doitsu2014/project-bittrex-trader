@@ -94,7 +94,7 @@ header h1 {
 .cd-popup-trigger {
   float:right;
   display: block;
-  width: 170px;
+  /* width: 170px; */
   height: 50px;
   line-height: 50px;
   margin: 0px;
@@ -120,11 +120,18 @@ xpopup
 }
 .navbar a {
 	line-height: 50px;
-	margin: 0px;
+	margin-top: -1px;
 	text-align: center;
 	color: #FFF;
 	font-size: 14px;
+	padding: 15px 25px !important;
 }
+
+.navbar a:hover, a:focus {
+	background-color: #b463ff !important;
+    color: #ffffff;
+}
+
 .textbox {
 	width: 88%;
     height: 39px;
@@ -141,9 +148,7 @@ xpopup
 
 .textbox:focus {
 	border:5px solid rgba(0, 0, 0, 0);
-	-webkit-box-shadow: 0px 0px 5px 0px rgb(113, 0, 255);
-    -moz-box-shadow: 0px 0px 5px 0px rgb(113, 0, 255);
-    box-shadow: 0px 0px 5px 0px rgb(113, 0, 255);
+	outline:none;
 }
 .buttom {
 	width: 88%;
@@ -217,14 +222,24 @@ xpopup
   -moz-transition-duration: 0.3s;
   transition-duration: 0.3s;
 }
+
 .shadow-purple{
 	color: #30006d;
-	-webkit-box-shadow: 0px 0px 50px 0px rgb(88, 0, 146);
-    -moz-box-shadow: 0px 0px 50px 0px rgb(88, 0, 146);
-    box-shadow: 0px 0px 50px 0px rgb(88, 0, 146);
+	-webkit-box-shadow: 0px 0px 25px 0px rgb(88, 0, 146);
+    -moz-box-shadow: 0px 0px 25px 0px rgb(88, 0, 146);
+    box-shadow: 0px 0px 25px 0px rgb(88, 0, 146);
 	padding:45px;
 	line-height:25px;
 }
+.shadow-purple h2 {
+	font-size:30px;
+}
+
+.guide-content {
+	text-align:left;
+	margin:30px 10px;;
+}
+
 .cd-popup-container p {
   padding: 3em 1em;
 }
