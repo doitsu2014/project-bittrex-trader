@@ -47,20 +47,12 @@ angular.module('tradeCtrl', ['tradeService'])
 
 		vm.isConfirm = false;
 		vm.isStartAutos = false;
+		vm.confirmMess = "";
+		vm.countConfirm = 0;
 		vm.setupAutoTrade = function () {
 			vm.dangerFormAuto = validateFormAuto();
 			if (!vm.dangerFormAuto) {
 				var limitCoin2 = vm.currentMarket ? vm.currentMarket.MarketName.split('-')[0] : "USDT";
-
-
-				// alert(`
-				// -- Market Name: ${vm.currentMarket.MarketName} 
-				// -- Limit Coin 2: ${vm.autoData.autoLimitCoin2}
-				// -- : ${vm.autoData.basePriceTime}
-				// -- : ${vm.autoData.autoTradeTime}
-				// -- T-Buy ${vm.autoData.autoTBuy} 
-				// -- T-Sell ${vm.autoData.autoTSell}
-				// `);
 				
 				// remove danger div if success confirm
 				vm.dangerFormAuto = null;
@@ -72,8 +64,10 @@ angular.module('tradeCtrl', ['tradeService'])
 				vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;
 
 				// create success div if success confirm
-				vm.confirmMess += `Market Name: ${vm.currentMarket.MarketName}<br/>Limit ${limitCoin2}: ${vm.autoData.autoLimitCoin2}<br/>Price Bid: ${vm.autoData.autoPriceBid}<br/>Base Price Bid: ${vm.autoData.autoBasePriceBid}<br/>Price Bid: ${vm.autoData.autoPriceAsk}<br/>Base Price Bid: ${vm.autoData.autoBasePriceAsk}<br/>T-Buy ${vm.autoData.autoTBuy}<br/>T-Sell ${vm.autoData.autoTSell}`;				
+				vm.confirmMess += `Market Name: ${vm.currentMarket.MarketName}<br/>Limit ${limitCoin2}: ${vm.autoData.autoLimitCoin2}<br/>Price Bid: ${vm.autoData.autoPriceBid}<br/>Base Price Bid: ${vm.autoData.autoBasePriceBid}<br/>Price Ask: ${vm.autoData.autoPriceAsk}<br/>Base Price Ask: ${vm.autoData.autoBasePriceAsk}<br/>T-Buy ${vm.autoData.autoTBuy}<br/>T-Sell ${vm.autoData.autoTSell}`;				
+				
 
+				++vm.countConfirm;
 				vm.isConfirm = true;
 			}
 		};
@@ -84,6 +78,12 @@ angular.module('tradeCtrl', ['tradeService'])
 				vm.autoData.autoTempBalance = 0;
 				vm.autoData.autoLimitCoin2 = 0;
 				vm.confirmMess += "<br/><br/>Finished! Good luck!<br/><br/>";
+				if (vm.countConfirm >= 5) {
+					--vm.countConfirm;
+					var indexOfCleanCFM = vm.confirmMess.indexOf("<br/><br/>Finished! Good luck!<br/><br/>", 4);
+					var lastIndexOfClean = vm.confirmMess.length;
+					vm.confirmMess = vm.confirmMess.slice(indexOfCleanCFM, lastIndexOfClean);
+				}
 				vm.isConfirm = false;
 			}
 		};
@@ -215,8 +215,9 @@ angular.module('tradeCtrl', ['tradeService'])
 			var result = "";
 			result += basePriceTimeRegExp.test(vm.autoData.basePriceTime) ? "" : "Base Price Time is not valid<br/>";
 			result += tradeTimeRegExp.test(vm.autoData.autoTradeTime) ? "" : "Trade Time is not valid<br/>";
-			result += Number.parseFloat(vm.autoData.autoTBuy) != 0 ? "" : "T-Buy should not 0 value<br/>";
-			result += Number.parseFloat(vm.autoData.autoTSell) != 0 ? "" : "T-Sell should not 0 valu<br/>";
+			result += Number.parseFloat(vm.autoData.autoTBuy) != 0 ? "" : "T-Buy should not 0<br/>";
+			result += Number.parseFloat(vm.autoData.autoTSell) != 0 ? "" : "T-Sell should not 0<br/>";
+			result += Number.parseFloat(vm.autoData.autoTempBalance) > 0 ? "" : "Temp Balance should not bigger than 0<br/>";
 			return result;
 		};
 

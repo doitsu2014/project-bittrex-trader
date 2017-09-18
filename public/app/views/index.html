@@ -37,13 +37,25 @@
 			 font-family: 'Arima Madurai', cursive;
 		}
 
+		.main-footer {
+			position: fixed;
+			height: 2em;
+			background-color: rgba(22, 5, 28, 0.8);
+			bottom: 0;
+			
+		}
+		.main-footer p {
+			color:white; font-weight:bold; font-size:1em; text-align:center;
+			margin-top: 0.5em;
+		}
+
 		.main-views {
-			margin-top:50px;
+			position: relative;			
+			margin-top:2em;
 			background-color: rgba(6, 0, 12, 0.8);
 			border-radius: 0.5em;
 			padding-top: 25px;
 			padding-bottom: 25px;
-			position: relative;
 			z-index: 0;
 			color: #f0e2ff;
 		}
@@ -131,8 +143,12 @@
 		<!-- cd-aboutme-popup-container -->
 	</div>
 	<!--  cd-aboutme-popup -->
-	<div class="col-lg-10 col-md-offset-1 main-views" ng-view>
+	<div class="col-lg-10 col-md-offset-1 main-views" style="position: relative;" ng-view>
 
+	</div>
+
+	<div class="col-lg-12 main-footer">
+		<p style="">Copy right @ GMB and DOITSU</p>
 	</div>
 
 	<!-- jQuery -->

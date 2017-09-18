@@ -217,11 +217,6 @@
 					<th>Last</th>
 					<th>Bid</th>
 					<th>Ask</th>
-					<!-- Hide some information no need to use tool
-					<th>Base Volume</th>
-					<th>Volume</th>
-					<th>Time Stamp</th> 
-					-->
 				</tr>
 			</thead>
 			<tbody>
@@ -232,11 +227,6 @@
 					<td>{{ trade.currentMarket.Last }}</td>
 					<td>{{ trade.currentMarket.Bid }}</td>
 					<td>{{ trade.currentMarket.Ask }}</td>
-					<!-- Hide some information no need to use tool
-					<td>{{ trade.currentMarket.Volume }}</td>
-					<td>{{ trade.currentMarket.BaseVolume }}</td>
-					<td>{{ trade.currentMarket.TimeStamp }}</td>
-					-->
 				</tr>
 			</tbody>
 		</table>
@@ -377,8 +367,8 @@
 					<textarea name="" id="" cols="auto" rows="auto" disabled ng-model="trade.tradeLog"></textarea>
 				</div>
 			</div>
-			<a href="#0" class="cd-popup-close cd-tradelogs-popup-close img-replace" ng-click="trade.stopLogsPopup();">Close</a>
-		</div>
+			<a href="" class="cd-popup-close cd-tradelogs-popup-close img-replace" ng-click="trade.stopLogsPopup();">Close</a>
+		</div>	
 		<!-- cd-tradelogs-popup-container -->
 	</div>
 	<!--  cd-tradelogs-popup -->
