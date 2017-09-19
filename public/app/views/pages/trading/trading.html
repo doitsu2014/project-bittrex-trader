@@ -64,16 +64,20 @@
 		display: table-row;
 		resize: none;
 		border: none;
-		/* if you keep border then textarea will go out of the parent element */
-		height: 10em;
+		height: 350px;
 		width: 100%;
-		/* hardcoded */
-		padding: 0px;
-		/* removing padding for chrome */
-		color: black;
-		background-color: rgba(132, 58, 230, 0.21);
+		background-color: rgba(0 ,0 ,0 ,0);
+		margin: 15px 0px 0px 15px;
 	}
-
+	
+	.title-log {
+		height: 50px !important;
+		line-height: 50px;
+		font-size: 23px;
+		color: #fff;
+		background-color: #7000bf !important;
+	}
+	
 	.trade-area input:disabled,
 	input:disabled::placeholder {
 		color: #fff;
@@ -171,8 +175,8 @@
 	}
 	.btn-danger:hover {
 		color: #fff;
-		background-color: #ff4d4d;
-		border-color: #ff4d4d;
+		background-color: #ff7272;
+		border-color: #ff7272;
 	}
 	
 	.btn-danger.disabled, .btn-danger.disabled.active, .btn-danger.disabled.focus, .btn-danger.disabled:active, .btn-danger.disabled:focus, .btn-danger.disabled:hover, .btn-danger[disabled], .btn-danger[disabled].active, .btn-danger[disabled].focus, .btn-danger[disabled]:active, .btn-danger[disabled]:focus, .btn-danger[disabled]:hover, fieldset[disabled] .btn-danger, fieldset[disabled] .btn-danger.active, fieldset[disabled] .btn-danger.focus, fieldset[disabled] .btn-danger:active, fieldset[disabled] .btn-danger:focus, fieldset[disabled] .btn-danger:hover {
@@ -183,9 +187,9 @@
 	}
 	
 	.alert-danger{
-		background-color: rgba(0, 0, 0, 0);
-		color: #BE2B2B;
-		border: 1px solid #BE2B2B;
+		background-color: rgba(197, 0, 0, 0.09);
+		color: #ffffff;
+		border: none;
 	}
 	
 	.alert-success{
@@ -362,8 +366,9 @@
 
 	<div class="cd-popup cd-tradelogs-popup" role="alert">
 		<div class="cd-popup-container">
-			<div class="shadow-purple">
+			<div class="shadow-purple" style="padding:40px 25px 20px 25px;">
 				<div class="log-area">
+					<div class="title-log">Lịch sử giao dịch</div>
 					<textarea name="" id="" cols="auto" rows="auto" disabled ng-model="trade.tradeLog"></textarea>
 				</div>
 			</div>

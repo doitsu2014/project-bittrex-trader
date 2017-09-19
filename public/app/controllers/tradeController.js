@@ -217,7 +217,7 @@ angular.module('tradeCtrl', ['tradeService'])
 			result += tradeTimeRegExp.test(vm.autoData.autoTradeTime) ? "" : "Trade Time is not valid<br/>";
 			result += Number.parseFloat(vm.autoData.autoTBuy) != 0 ? "" : "T-Buy should not 0<br/>";
 			result += Number.parseFloat(vm.autoData.autoTSell) != 0 ? "" : "T-Sell should not 0<br/>";
-			result += Number.parseFloat(vm.autoData.autoTempBalance) > 0 ? "" : "Temp Balance should not bigger than 0<br/>";
+			result += Number.parseFloat(vm.autoData.autoLimitCoin2) > 0 ? "" : "Limit Balance should bigger than 0<br/>";
 			return result;
 		};
 
