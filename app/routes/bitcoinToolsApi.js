@@ -158,7 +158,7 @@ module.exports = function (app, express) {
 					return res.send(err);
 				}
 				// orders book here
-				var ordersBook = data.result;
+				var ordersBook = data.result.slice(0, 100);
 				var baseQuantity = Number.parseFloat(reqQuantity);
 				if (baseQuantity <= 0) {
 					return res.json({
@@ -173,72 +173,25 @@ module.exports = function (app, express) {
 				var totalFail = 0;
 				// count to know the end of loop before return res.json
 				var countLoop = 0;
-				asyncLoop(ordersBook, function (item, next) {
-					// good quantity, you have to pay
-					// base quantity in buy action is the left side of market, 
-					// so we have to convert it to right side that action help us to pass a good quantity to action buy
-					var goodQuantity = baseQuantity / item.Rate;
-					if (goodQuantity > 0) {
-						if (goodQuantity <= item.Quantity) {
-							// buy all good quantity
-							bittrex.buylimit({
-								market: reqMarketName,
-								quantity: goodQuantity,
-								rate: item.Rate
-							}, function (data, err) {
-								if (err) {
-									// end of buy cycle you buy all base quantity
-									resultMes += `Buy: Quantity_${goodQuantity.toFixed(3)} --- Rate_${item.Rate.toFixed(3)} --- Message_${err.message}\n`;
-									totalFail += baseQuantity;
-									baseQuantity -= item.Quantity * item.Rate;
-									return res.json({
-										success: false,
-										message: resultMes,
-										totalSuccess: totalSuccess,
-										totalFail: totalFail
-									});
-								} else {
-									resultMes += `Buy: Quantity_${goodQuantity.toFixed(3)} --- Rate_${item.Rate.toFixed(3)} --- Message_Success\n`;
-									totalSuccess += baseQuantity;
-									baseQuantity -= item.Quantity * item.Rate;
-									return res.json({
-										success: "true",
-										message: resultMes,
-										totalSuccess: totalSuccess,
-										totalFail: totalFail
-									});
-								}
-							});
-						} else {
-							// buy all order Quantity
-							bittrex.buylimit({
-								market: reqMarketName,
-								quantity: item.Quantity,
-								rate: item.Rate
-							}, function (data, err) {
-								if (err) {
-									// return res.json({success:false, message: err});
-									resultMes += `Buy: Quantity_${item.Quantity.toFixed(3)} --- Rate_${item.Rate.toFixed(3)} --- Message_${err.message}\n`;
-									totalFail += item.Quantity * item.Rate;
-									baseQuantity -= item.Quantity * item.Rate;
-									//if end of loop => return directly
-									if (countLoop === ordersBook.length - 1) {
-										return res.json({
-											success: false,
-											message: resultMes,
-											totalSuccess: totalSuccess,
-											totalFail: totalFail
-										});
-									} else {
-										++countLoop;
-										next();
-									}
-								} else {
-									resultMes += `Buy: Quantity_${item.Quantity.toFixed(3)} --- Rate_${item.Rate.toFixed(3)} --- Message_Success}\n`;
-									totalSuccess += item.Quantity * item.Rate;
-									baseQuantity -= item.Quantity * item.Rate;
-									//if end of loop => return directly
-									if (countLoop === ordersBook.length - 1) {
+				try {
+					asyncLoop(ordersBook, function (item, next) {
+						// good quantity, you have to pay
+						// base quantity in buy action is the left side of market, 
+						// so we have to convert it to right side that action help us to pass a good quantity to action buy
+						var goodQuantity = baseQuantity / item.Rate;
+						if (goodQuantity > 0) {
+							if (goodQuantity <= item.Quantity) {
+								// buy all good quantity
+								bittrex.buylimit({
+									market: reqMarketName,
+									quantity: goodQuantity,
+									rate: item.Rate
+								}, function (data, err) {
+									if (err) {
+										// end of buy cycle you buy all base quantity
+										resultMes += `Buy: Quantity_${goodQuantity} --- Rate_${item.Rate} --- Message_${err.message}\n`;
+										totalFail += baseQuantity;
+										baseQuantity -= item.Quantity * item.Rate;
 										return res.json({
 											success: true,
 											message: resultMes,
@@ -246,16 +199,73 @@ module.exports = function (app, express) {
 											totalFail: totalFail
 										});
 									} else {
-										++countLoop;
-										next();
+										resultMes += `Buy: Quantity_${goodQuantity} --- Rate_${item.Rate} --- Message_Success\n`;
+										totalSuccess += baseQuantity;
+										baseQuantity -= item.Quantity * item.Rate;
+										return res.json({
+											success: true,
+											message: resultMes,
+											totalSuccess: totalSuccess,
+											totalFail: totalFail
+										});
 									}
-								}
-							});
+								});
+							} else {
+								// buy all order Quantity
+								bittrex.buylimit({
+									market: reqMarketName,
+									quantity: item.Quantity,
+									rate: item.Rate
+								}, function (data, err) {
+									if (err) {
+										// return res.json({success:false, message: err});
+										resultMes += `Buy: Quantity_${item.Quantity} --- Rate_${item.Rate} --- Message_${err.message}\n`;
+										totalFail += item.Quantity * item.Rate;
+										baseQuantity -= item.Quantity * item.Rate;
+										//if end of loop => return directly
+										if (countLoop === ordersBook.length - 1) {
+											return res.json({
+												success: true,
+												message: resultMes,
+												totalSuccess: totalSuccess,
+												totalFail: totalFail
+											});
+										} else {
+											++countLoop;
+											next();
+										}
+									} else {
+										resultMes += `Buy: Quantity_${item.Quantity} --- Rate_${item.Rate} --- Message_Success}\n`;
+										totalSuccess += item.Quantity * item.Rate;
+										baseQuantity -= item.Quantity * item.Rate;
+										//if end of loop => return directly
+										if (countLoop === ordersBook.length - 1) {
+											return res.json({
+												success: true,
+												message: resultMes,
+												totalSuccess: totalSuccess,
+												totalFail: totalFail
+											});
+										} else {
+											++countLoop;
+											next();
+										}
+									}
+								});
+							}
 						}
-					}
-				}, function (err) {
+					}, function (err) {
 
-				});
+					});
+				} catch (err) {
+					return res.json({
+						success: false,
+						message: resultMes,
+						totalSuccess: totalSuccess,
+						totalFail: totalFail
+					});
+				}
+
 			});
 		});
 
@@ -277,7 +287,7 @@ module.exports = function (app, express) {
 					return res.send(err);
 				}
 				// orders book here
-				var ordersBook = data.result;
+				var ordersBook = data.result.slice(0, 100);
 				var baseQuantity = Number.parseFloat(reqQuantity);
 				if (baseQuantity <= 0) {
 					return res.json({
@@ -292,68 +302,24 @@ module.exports = function (app, express) {
 				var totalFail = 0;
 				// count to know the end of loop before return res.json
 				var countLoop = 0;
-				asyncLoop(ordersBook, function (item, next) {
-					// good quantity, you have to pay 
-					// var goodQuantity = Number.parseFloat(baseQuantity) / Number.parseFloat(item.Rate);
-					if (baseQuantity > 0) {
-						if (baseQuantity <= item.Quantity) {
-							// sell all good quantity
-							bittrex.selllimit({
-								market: reqMarketName,
-								quantity: baseQuantity,
-								rate: item.Rate
-							}, function (data, err) {
-								if (err) {
-									// baseQuantity -= Number.parseFloat(item.Rate) * goodQuantity;
-									resultMes += `Sell: Quantity_${baseQuantity.toFixed(3)} --- Rate_${item.Rate.toFixed(3)} --- Message_${err.message}\n`;
-									totalFail += baseQuantity * item.Rate;
-									baseQuantity -= item.Quantity;
-									return res.json({
-										success: false,
-										message: resultMes,
-										totalSuccess: totalSuccess,
-										totalFail: totalFail
-									});
-								} else {
-									resultMes += `Sell: Quantity_${baseQuantity.toFixed(3)} --- Rate_${item.Rate.toFixed(3)} --- Message_Success\n`;
-									totalSuccess += baseQuantity * item.Rate;
-									baseQuantity -= item.Quantity;
-									return res.json({
-										success: "true",
-										message: resultMes,
-										totalSuccess: totalSuccess,
-										totalFail: totalFail
-									});
-								}
-							});
-						} else {
-							// sell all order Quantity
-							bittrex.selllimit({
-								market: reqMarketName,
-								quantity: item.Quantity,
-								rate: item.Rate
-							}, function (data, err) {
-								if (err) {
-									// return res.json({success:false, message: err});
-									resultMes += `Sell: Quantity_${item.Quantity.toFixed(3)} --- Rate_${item.Rate.toFixed(3)} --- Message_${err.message}\n`;
-									totalFail += item.Quantity * item.Rate;
-									baseQuantity -= item.Quantity;
-									if (countLoop === ordersBook.length - 1) {
-										return res.json({
-											success: false,
-											message: resultMes,
-											totalSuccess: totalSuccess,
-											totalFail: totalFail
-										});
-									} else {
-										++countLoop;
-										next();
-									}
-								} else {
-									resultMes += `Sell: Quantity_${item.Quantity.toFixed(3)} --- Rate_${item.Rate.toFixed(3)} --- Message_Success}\n`;
-									totalSuccess += item.Quantity * item.Rate;
-									baseQuantity -= item.Quantity;
-									if (countLoop === ordersBook.length - 1) {
+
+				try {
+					asyncLoop(ordersBook, function (item, next) {
+						// good quantity, you have to pay 
+						// var goodQuantity = Number.parseFloat(baseQuantity) / Number.parseFloat(item.Rate);
+						if (baseQuantity > 0) {
+							if (baseQuantity <= item.Quantity) {
+								// sell all good quantity
+								bittrex.selllimit({
+									market: reqMarketName,
+									quantity: baseQuantity,
+									rate: item.Rate
+								}, function (data, err) {
+									if (err) {
+										// baseQuantity -= Number.parseFloat(item.Rate) * goodQuantity;
+										resultMes += `Sell: Quantity_${baseQuantity} --- Rate_${item.Rate} --- Message_${err.message}\n`;
+										totalFail += baseQuantity * item.Rate;
+										baseQuantity -= item.Quantity;
 										return res.json({
 											success: true,
 											message: resultMes,
@@ -361,17 +327,72 @@ module.exports = function (app, express) {
 											totalFail: totalFail
 										});
 									} else {
-										++countLoop;
-										next();
+										resultMes += `Sell: Quantity_${baseQuantity} --- Rate_${item.Rate} --- Message_Success\n`;
+										totalSuccess += baseQuantity * item.Rate;
+										baseQuantity -= item.Quantity;
+										return res.json({
+											success: true,
+											message: resultMes,
+											totalSuccess: totalSuccess,
+											totalFail: totalFail
+										});
 									}
-								}
-							});
+								});
+							} else {
+								// sell all order Quantity
+								bittrex.selllimit({
+									market: reqMarketName,
+									quantity: item.Quantity,
+									rate: item.Rate
+								}, function (data, err) {
+									if (err) {
+										// return res.json({success:false, message: err});
+										resultMes += `Sell: Quantity_${item.Quantity} --- Rate_${item.Rate} --- Message_${err.message}\n`;
+										totalFail += item.Quantity * item.Rate;
+										baseQuantity -= item.Quantity;
+										if (countLoop === ordersBook.length - 1) {
+											return res.json({
+												success: true,
+												message: resultMes,
+												totalSuccess: totalSuccess,
+												totalFail: totalFail
+											});
+										} else {
+											++countLoop;
+											next();
+										}
+									} else {
+										resultMes += `Sell: Quantity_${item.Quantity} --- Rate_${item.Rate} --- Message_Success\n`;
+										totalSuccess += item.Quantity * item.Rate;
+										baseQuantity -= item.Quantity;
+										if (countLoop === ordersBook.length - 1) {
+											return res.json({
+												success: true,
+												message: resultMes,
+												totalSuccess: totalSuccess,
+												totalFail: totalFail
+											});
+										} else {
+											++countLoop;
+											next();
+										}
+									}
+								});
+							}
 						}
-					}
 
-				}, function (err) {
+					}, function (err) {
 
-				});
+					});
+				} catch (err) {
+					return res.json({
+						success: false,
+						message: resultMes,
+						totalSuccess: totalSuccess,
+						totalFail: totalFail
+					});
+				}
+
 			});
 		});
 
@@ -391,7 +412,7 @@ module.exports = function (app, express) {
 						message: err
 					});
 				}
-				res.json({
+				return res.json({
 					balance: data.result
 				});
 			});
@@ -413,7 +434,7 @@ module.exports = function (app, express) {
 						message: "err"
 					});
 				}
-				res.json({
+				return res.json({
 					Orders: data.result
 				});
 			});

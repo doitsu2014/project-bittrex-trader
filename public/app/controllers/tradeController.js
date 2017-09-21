@@ -23,10 +23,19 @@ angular.module('tradeCtrl', ['tradeService'])
 		vm.getMarket = function () {
 			TradeService.getMarket(vm.marketName || 'USDT-BTC')
 				.then(function (data) {
-					vm.currentMarket = data ? data[0] : null;
-					if ($location.path() === tradeUrl) {
+					try {
+						vm.currentMarket = data ? data[0] : null;
+						if ($location.path() === tradeUrl) {
+							$timeout(vm.getMarket, 500);
+						}
+					} catch (err) {
+						console.log(err);
 						$timeout(vm.getMarket, 500);
 					}
+
+				}).catch(function (err) {
+					console.log(err);
+					$timeout(vm.getMarket, 500);
 				});
 		};
 		vm.getMarket();
@@ -36,7 +45,7 @@ angular.module('tradeCtrl', ['tradeService'])
 			// get balance for sell method so you need the name of the left side
 			var reqCurrency = vm.currentMarket ? vm.currentMarket.MarketName.split('-')[1] : "BTC";
 
-			
+
 			return $q((resolve, reject) => {
 				TradeService.getBalance(reqCurrency)
 					.then(data => {
@@ -53,19 +62,19 @@ angular.module('tradeCtrl', ['tradeService'])
 			vm.dangerFormAuto = validateFormAuto();
 			if (!vm.dangerFormAuto) {
 				var limitCoin2 = vm.currentMarket ? vm.currentMarket.MarketName.split('-')[0] : "USDT";
-				
+
 				// remove danger div if success confirm
 				vm.dangerFormAuto = null;
-				
+
 				// update price informations
 				vm.autoData.autoPriceBid = vm.currentMarket.Bid;
-				vm.autoData.autoPriceAsk = vm.currentMarket.Ask;			
+				vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
 				vm.autoData.autoBasePriceBid = vm.currentMarket.Bid;
 				vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;
 
 				// create success div if success confirm
-				vm.confirmMess += `Market Name: ${vm.currentMarket.MarketName}<br/>Limit ${limitCoin2}: ${vm.autoData.autoLimitCoin2}<br/>Price Bid: ${vm.autoData.autoPriceBid}<br/>Base Price Bid: ${vm.autoData.autoBasePriceBid}<br/>Price Ask: ${vm.autoData.autoPriceAsk}<br/>Base Price Ask: ${vm.autoData.autoBasePriceAsk}<br/>T-Buy ${vm.autoData.autoTBuy}<br/>T-Sell ${vm.autoData.autoTSell}`;				
-				
+				vm.confirmMess += `Market Name: ${vm.currentMarket.MarketName}<br/>Limit ${limitCoin2}: ${vm.autoData.autoLimitCoin2}<br/>Price Bid: ${vm.autoData.autoPriceBid}<br/>Base Price Bid: ${vm.autoData.autoBasePriceBid}<br/>Price Ask: ${vm.autoData.autoPriceAsk}<br/>Base Price Ask: ${vm.autoData.autoBasePriceAsk}<br/>T-Buy ${vm.autoData.autoTBuy}<br/>T-Sell ${vm.autoData.autoTSell}`;
+
 
 				++vm.countConfirm;
 				vm.isConfirm = true;
@@ -92,7 +101,7 @@ angular.module('tradeCtrl', ['tradeService'])
 			vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
 			vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
 			vm.autoData.autoPriceBid = vm.currentMarket.Bid;
-			vm.autoData.autoPriceAsk = vm.currentMarket.Ask;			
+			vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
 			vm.autoData.autoBasePriceBid = vm.currentMarket.Bid;
 			vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;
 			vm.isStartAutos = true;
@@ -104,36 +113,42 @@ angular.module('tradeCtrl', ['tradeService'])
 		var autoTrade = () => {
 			if (vm.isConfirm) {
 				if (vm.isStartAutos) {
-					if (vm.autoData.autoTradeTimeDelay != 0) {
-						vm.autoData.autoTradeTimeDelay -= 1;
-						$timeout(autoTrade, 1000);
-					} else {
-						vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
-						// check temp balance
-						var x = vm.autoData.autoLimitCoin2 - vm.autoData.autoTempBalance;
-						var typeOfTrade;
-						if (x > 0) {
-							// check buy and sell 
-							typeOfTrade = checkConditions();
-							if (typeOfTrade === Constants.TypeOfTrade.buy) {
-								// after buyLimit will setTimeout
-								buyLimit();
-							} else if (typeOfTrade === Constants.TypeOfTrade.sell) {
-								// after sellLimit will setTimeout
-								sellLimit();
-							} else {
-								// otherwise
-								$timeout(autoTrade, 1000);
-							}
+					try {
+						if (vm.autoData.autoTradeTimeDelay != 0) {
+							vm.autoData.autoTradeTimeDelay -= 1;
+							$timeout(autoTrade, 1000);
 						} else {
-							typeOfTrade = checkConditions();
-							if (typeOfTrade === Constants.TypeOfTrade.sell) {
-								// after sellLimit will setTimeout								
-								sellLimit();
+							vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
+							// check temp balance
+							var x = vm.autoData.autoLimitCoin2 - vm.autoData.autoTempBalance;
+							var typeOfTrade, buyResult, sellResult;
+							if (x > 0) {
+								// check buy and sell 
+								typeOfTrade = checkConditions();
+								if (typeOfTrade === Constants.TypeOfTrade.buy) {
+									// after buyLimit will setTimeout
+									buyResult = buyLimit();
+								} else if (typeOfTrade === Constants.TypeOfTrade.sell) {
+									// after sellLimit will setTimeout
+									sellResult = sellLimit();
+								} else {
+									// otherwise
+									$timeout(autoTrade, 1000);
+								}
 							} else {
-								$timeout(autoTrade, 1000);
+								typeOfTrade = checkConditions();
+								if (typeOfTrade === Constants.TypeOfTrade.sell) {
+									// after sellLimit will setTimeout								
+									sellResult = sellLimit();
+								} else {
+									$timeout(autoTrade, 1000);
+								}
 							}
 						}
+					} catch (err) {
+						console.log(`TradeController-AutoTrade: Error (${err})\n`);
+						vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
+						$timeout(autoTrade, 1000);
 					}
 				}
 			}
@@ -144,9 +159,20 @@ angular.module('tradeCtrl', ['tradeService'])
 			var reqQuantity = vm.autoData.autoLimitCoin2 - vm.autoData.autoTempBalance;
 			TradeService.buyLimit2(reqMarketName, reqQuantity)
 				.then(function (data) {
-					vm.autoData.autoTempBalance += data.data.totalSuccess;
-					vm.tradeLog += data.data.message;
+					try {
+						vm.autoData.autoTempBalance += data.data.totalSuccess;
+						vm.tradeLog += data.data.message;
+						$timeout(autoTrade, 1000);
+						return true;
+					} catch (err) {
+						console.log(`TradeController-BuyLimit: Error (${err})\n`);
+						$timeout(autoTrade, 1000);
+						return false;
+					}
+				}).catch(function (err) {
+					console.log(`TradeController-BuyLimit: Error (${err})\n`);
 					$timeout(autoTrade, 1000);
+					return false;
 				});
 		};
 
@@ -157,12 +183,23 @@ angular.module('tradeCtrl', ['tradeService'])
 					var reqQuantity = data.Available;
 					TradeService.sellLimit2(reqMarketName, reqQuantity)
 						.then(function (data) {
-							vm.autoData.autoTempBalance -= data.data.totalSuccess;
-							if(vm.autoData.autoTempBalance < 0) {
-								vm.autoData.autoTempBalance = 0;
+							try {
+								vm.autoData.autoTempBalance -= data.data.totalSuccess;
+								if (vm.autoData.autoTempBalance < 0) {
+									vm.autoData.autoTempBalance = 0;
+								}
+								vm.tradeLog += data.data.message;
+								$timeout(autoTrade, 1000);
+								return true;
+							} catch (err) {
+								console.log(`TradeController-SellLimit: Error (${err})\n`);
+								$timeout(autoTrade, 1000);
+								return false;
 							}
-							vm.tradeLog += data.data.message;
+						}).catch(function (err) {
+							console.log(`TradeController-SellLimit: Error (${err})\n`);
 							$timeout(autoTrade, 1000);
+							return false;
 						});
 				});
 		};
@@ -173,7 +210,7 @@ angular.module('tradeCtrl', ['tradeService'])
 			if (y < 0) {
 				if (y <= vm.autoData.autoTSell) {
 					return Constants.TypeOfTrade.sell;
-				} 
+				}
 			} else if (x > 0) {
 				if (x > vm.autoData.autoTBuy) {
 					return Constants.TypeOfTrade.buy;
@@ -186,18 +223,26 @@ angular.module('tradeCtrl', ['tradeService'])
 		var autoBasePrice = () => {
 			if (vm.isConfirm) {
 				if (vm.isStartAutos) {
-					if (vm.autoData.basePriceTimeDelay != 0) {
+					try {
+						if (vm.autoData.basePriceTimeDelay != 0) {
+							vm.autoData.basePriceTimeDelay -= 1;
+							vm.autoData.autoPriceBid = vm.currentMarket.Bid;
+							vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
+						} else {
+							vm.autoData.autoPriceBid = vm.currentMarket.Bid;
+							vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
+							vm.autoData.autoBasePriceBid = vm.currentMarket.Bid;
+							vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;
+							vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
+						}
+						$timeout(autoBasePrice, 1000);
+					} catch (err) {
+						console.log(`TradeController-AutoBasePrice: ${err}\n`);
 						vm.autoData.basePriceTimeDelay -= 1;
-						vm.autoData.autoPriceBid = vm.currentMarket.Bid;
-						vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
-					} else {
-						vm.autoData.autoPriceBid = vm.currentMarket.Bid;
-						vm.autoData.autoPriceAsk = vm.currentMarket.Ask;						
-						vm.autoData.autoBasePriceBid = vm.currentMarket.Bid;
-						vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;
 						vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
+						$timeout(autoBasePrice, 1000);
 					}
-					$timeout(autoBasePrice, 1000);
+
 				}
 			}
 		}
@@ -222,19 +267,23 @@ angular.module('tradeCtrl', ['tradeService'])
 		};
 
 		var conTimeToTimeStamp = (basicTime) => {
-			var elements = basicTime.split(":");
-			var result = parseInt(elements[0] * 3600) + parseInt(elements[1] * 60) + parseInt(elements[2]);
-			return result;
+			try {
+				var elements = basicTime.split(":");
+				var result = parseInt(elements[0] * 3600) + parseInt(elements[1] * 60) + parseInt(elements[2]);
+				return result;
+			} catch (err) {
+				console.log(`TradeController-conTimeToTimeStamp: ${err}`);
+				return 5;
+			}
 		};
 
-
 		vm.showLogsPopup = () => {
-			var popup = angular.element( document.querySelector( '.cd-tradelogs-popup' ) );
+			var popup = angular.element(document.querySelector('.cd-tradelogs-popup'));
 			popup.addClass('is-visible');
-		}
+		};
 
 		vm.stopLogsPopup = () => {
-			var popup = angular.element( document.querySelector( '.cd-tradelogs-popup' ) );
+			var popup = angular.element(document.querySelector('.cd-tradelogs-popup'));
 			popup.removeClass('is-visible');
-		}
+		};
 	});
