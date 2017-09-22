@@ -191,10 +191,10 @@ angular.module('tradeCtrl', ['tradeService'])
 									if (vm.autoData.autoTempBalance < 0) {
 										vm.autoData.autoTempBalance = 0;
 									}
-									vm.tradeLog += data.data.message;
-									vm.isDelayAfterSell=true;
 									vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
+									vm.isDelayAfterSell=true;
 									autoDelayAfterSell();
+									vm.tradeLog += data.data.message;
 								}
 
 								$timeout(autoTrade, 1000);
@@ -211,6 +211,10 @@ angular.module('tradeCtrl', ['tradeService'])
 						});
 				});
 		};
+		vm.testSell = function () {
+			sellLimit();
+		}
+		
 		// this function will return type of trade
 		var checkConditions = function () {
 			var x = vm.autoData.autoPriceBid - vm.autoData.autoBasePriceBid;
