@@ -286,6 +286,16 @@
 						<input id="autoTradeTimeDelay" ng-model="trade.autoData.autoTradeTimeDelay" placeholder="0s" type="text" place-holder="0s"
 						    disabled>
 					</div>
+					<div class="col-md-6 form-group">
+						<label for="autoAfterSellTime">After Sell Time: </label>
+						<input id="autoAfterSellTime" ng-init="trade.autoData.autoAfterSellTime='00:00:00'" ng-model="trade.autoData.autoAfterSellTime" placeholder="00:00:00"
+						    type="text" ng-disabled="trade.isConfirm" required>
+					</div>
+					<div class="col-md-6 form-group">
+						<label for="autoAfterSellTimeDelay">Delay: </label>
+						<input id="autoAfterSellTimeDelay" ng-model="trade.autoData.autoAfterSellTimeDelay" placeholder="0s" type="text" place-holder="0s"
+						    disabled>
+					</div>
 				</div>
 
 				<div class="col-md-4 trade-control">
@@ -363,6 +373,10 @@
 		</form>
 	</div>
 
+	<!-- <div class="col-md-6 form-group">
+		<label for="test">Test: </label>
+		<input id="test" ng-click="trade.testDelayAfterSell()" type="button">
+	</div> -->
 
 	<div class="cd-popup cd-tradelogs-popup" role="alert">
 		<div class="cd-popup-container">

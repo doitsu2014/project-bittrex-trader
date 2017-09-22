@@ -125,7 +125,7 @@ angular.module('tradeCtrl', ['tradeService'])
 							if (x > 0) {
 								// check buy and sell 
 								typeOfTrade = checkConditions();
-								if (typeOfTrade === Constants.TypeOfTrade.buy) {
+								if (typeOfTrade === Constants.TypeOfTrade.buy && !vm.isDelayAfterSell) {
 									// after buyLimit will setTimeout
 									buyResult = buyLimit();
 								} else if (typeOfTrade === Constants.TypeOfTrade.sell) {
@@ -184,11 +184,19 @@ angular.module('tradeCtrl', ['tradeService'])
 					TradeService.sellLimit2(reqMarketName, reqQuantity)
 						.then(function (data) {
 							try {
-								vm.autoData.autoTempBalance -= data.data.totalSuccess;
-								if (vm.autoData.autoTempBalance < 0) {
-									vm.autoData.autoTempBalance = 0;
+								
+								// Delay buy after you sell and your balance must be not 0
+								if (reqQuantity > 0) {
+									vm.autoData.autoTempBalance -= data.data.totalSuccess;
+									if (vm.autoData.autoTempBalance < 0) {
+										vm.autoData.autoTempBalance = 0;
+									}
+									vm.tradeLog += data.data.message;
+									vm.isDelayAfterSell=true;
+									vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
+									autoDelayAfterSell();
 								}
-								vm.tradeLog += data.data.message;
+
 								$timeout(autoTrade, 1000);
 								return true;
 							} catch (err) {
@@ -242,17 +250,37 @@ angular.module('tradeCtrl', ['tradeService'])
 						vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
 						$timeout(autoBasePrice, 1000);
 					}
-
 				}
 			}
-		}
+		};
+
+		vm.isDelayAfterSell = false;
+		var autoDelayAfterSell = () => {
+			if (vm.isConfirm) {
+				if (vm.isDelayAfterSell) {
+					try {
+						if (vm.autoData.autoAfterSellTimeDelay != 0) {
+							vm.autoData.autoAfterSellTimeDelay -= 1;
+							$timeout(autoDelayAfterSell, 1000);
+						} else {
+							vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
+							vm.isDelayAfterSell = false;
+						}
+					} catch (err) {
+						console.log(`TradeController-AutoDelayAfterSell: ${err}\n`);
+						vm.isDelayAfterSell = false;						
+						vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
+					}
+				}
+			}
+		};
 
 		var serviceGetMarket = () => {
 			TradeService.getMarket(vm.marketName || 'USDT-BTC')
 				.then(function (data) {
 					vm.currentMarket = data ? data[0] : null;
 				});
-		}
+		};
 
 		var validateFormAuto = () => {
 			var basePriceTimeRegExp = /^[0-9]{2}:[0-9]{2}:[0-9]{2}$/;
