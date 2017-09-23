@@ -4,7 +4,6 @@ var jsonwebtoken = require('jsonwebtoken');
 var asyncLoop = require('node-async-loop');
 module.exports = function (app, express) {
 	var apiRouter = express.Router();
-
 	apiRouter.post('/authenticate', function (req, res) {
 		var userKey = req.body.userKey;
 		var userSecret = req.body.userSecret;
@@ -193,7 +192,7 @@ module.exports = function (app, express) {
 										totalFail += baseQuantity;
 										baseQuantity -= item.Quantity * item.Rate;
 										return res.json({
-											success: true,
+											success: false,
 											message: resultMes,
 											totalSuccess: totalSuccess,
 											totalFail: totalFail
@@ -225,7 +224,7 @@ module.exports = function (app, express) {
 										//if end of loop => return directly
 										if (countLoop === ordersBook.length - 1) {
 											return res.json({
-												success: true,
+												success: false,
 												message: resultMes,
 												totalSuccess: totalSuccess,
 												totalFail: totalFail
@@ -321,7 +320,7 @@ module.exports = function (app, express) {
 										totalFail += baseQuantity * item.Rate;
 										baseQuantity -= item.Quantity;
 										return res.json({
-											success: true,
+											success: false,
 											message: resultMes,
 											totalSuccess: totalSuccess,
 											totalFail: totalFail
@@ -352,7 +351,7 @@ module.exports = function (app, express) {
 										baseQuantity -= item.Quantity;
 										if (countLoop === ordersBook.length - 1) {
 											return res.json({
-												success: true,
+												success: false,
 												message: resultMes,
 												totalSuccess: totalSuccess,
 												totalFail: totalFail

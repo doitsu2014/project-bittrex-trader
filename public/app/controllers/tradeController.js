@@ -161,7 +161,9 @@ angular.module('tradeCtrl', ['tradeService'])
 				.then(function (data) {
 					try {
 						vm.autoData.autoTempBalance += data.data.totalSuccess;
-						vm.tradeLog += data.data.message;
+						if(data.data.success) {
+							vm.tradeLog += data.data.message;
+						}
 						$timeout(autoTrade, 1000);
 						return true;
 					} catch (err) {
@@ -191,10 +193,12 @@ angular.module('tradeCtrl', ['tradeService'])
 									if (vm.autoData.autoTempBalance < 0) {
 										vm.autoData.autoTempBalance = 0;
 									}
-									vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
-									vm.isDelayAfterSell=true;
-									autoDelayAfterSell();
-									vm.tradeLog += data.data.message;
+									if (data.data.success) {
+										vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
+										vm.isDelayAfterSell=true;
+										autoDelayAfterSell();
+										vm.tradeLog += data.data.message;
+									}
 								}
 
 								$timeout(autoTrade, 1000);
@@ -211,9 +215,6 @@ angular.module('tradeCtrl', ['tradeService'])
 						});
 				});
 		};
-		vm.testSell = function () {
-			sellLimit();
-		}
 		
 		// this function will return type of trade
 		var checkConditions = function () {
@@ -267,13 +268,13 @@ angular.module('tradeCtrl', ['tradeService'])
 							vm.autoData.autoAfterSellTimeDelay -= 1;
 							$timeout(autoDelayAfterSell, 1000);
 						} else {
-							vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
 							vm.isDelayAfterSell = false;
 						}
 					} catch (err) {
 						console.log(`TradeController-AutoDelayAfterSell: ${err}\n`);
+						vm.autoData.autoAfterSellTimeDelay = 0;
 						vm.isDelayAfterSell = false;						
-						vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
+						$timeout(autoDelayAfterSell, 1000);
 					}
 				}
 			}
@@ -290,6 +291,7 @@ angular.module('tradeCtrl', ['tradeService'])
 			var basePriceTimeRegExp = /^[0-9]{2}:[0-9]{2}:[0-9]{2}$/;
 			var tradeTimeRegExp = /^[0-9]{2}:[0-9]{2}:[0-9]{2}$/;
 			var result = "";
+			result += basePriceTimeRegExp.test(vm.autoData.autoAfterSellTime) ? "" : "After Sell Delay is not valid<br/>";
 			result += basePriceTimeRegExp.test(vm.autoData.basePriceTime) ? "" : "Base Price Time is not valid<br/>";
 			result += tradeTimeRegExp.test(vm.autoData.autoTradeTime) ? "" : "Trade Time is not valid<br/>";
 			result += Number.parseFloat(vm.autoData.autoTBuy) != 0 ? "" : "T-Buy should not 0<br/>";
