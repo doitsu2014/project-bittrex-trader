@@ -109,7 +109,9 @@ angular.module('tradeCtrl', ['tradeService'])
             autoBasePrice();
             vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
             autoTrade();
+
             vm.autoData.autoCoinPriceTimeDelay = conTimeToTimeStamp(vm.autoData.autoCoinPriceTime);
+            vm.autoData.coinAndPercent = vm.currentMarket.Last * vm.autoData.coinPercent / 100;
             autoCoinPriceTool();
 
         };
@@ -244,11 +246,11 @@ angular.module('tradeCtrl', ['tradeService'])
                 var lastPrice = vm.currentMarket.Last;
 
                 if (y < 0) {
-                    if (askPriceAfterProfit < lastPrice) {
+                    if (tempX < tempY < tempZ && tempZ - tempX > coinAfterPercent) {
                         if (y <= vm.autoData.autoTSell) {
                             return Constants.TypeOfTrade.sell;
                         }
-                    } else if (askPriceAfterLoss > lastPrice) {
+                    } else if (tempX > lastPrice + (tempX*vm.autoData.lossPercent / 100)) {
                         return Constants.TypeOfTrade.sell;
                     } else {
                         return Constants.TypeOfTrade.doNothing;
@@ -277,19 +279,11 @@ angular.module('tradeCtrl', ['tradeService'])
                             vm.autoData.basePriceTimeDelay -= 1;
                             vm.autoData.autoPriceBid = vm.currentMarket.Bid;
                             vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
-
-                            vm.autoData.askPriceAfterProfit = vm.autoData.autoPriceAsk + (vm.autoData.autoPriceAsk * vm.autoData.profitPercent / 100);
-                            vm.autoData.askPriceAfterLoss = vm.autoData.autoPriceAsk - (vm.autoData.autoPriceAsk * vm.autoData.lossPercent / 100);
-
                         } else {
                             vm.autoData.autoPriceBid = vm.currentMarket.Bid;
                             vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
                             vm.autoData.autoBasePriceBid = vm.currentMarket.Bid;
                             vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;
-
-                            vm.autoData.askPriceAfterProfit = vm.autoData.autoPriceAsk + (vm.autoData.autoPriceAsk * vm.autoData.profitPercent / 100);
-                            vm.autoData.askPriceAfterLoss = vm.autoData.autoPriceAsk - (vm.autoData.autoPriceAsk * vm.autoData.lossPercent / 100);
-
                             vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
                         }
                         $timeout(autoBasePrice, 1000);
@@ -311,13 +305,11 @@ angular.module('tradeCtrl', ['tradeService'])
                         if (vm.autoData.autoCoinPriceTimeDelay > 0) {
                             vm.autoData.autoCoinPriceTimeDelay -= 1;
                         } else {
-                            // Lấy giá của Price gan cho vm.autoData.coinPercent
-                            vm.autoData.autoCoinPrice = vm.currentMarket.Last;
-                            vm.autoData.coinAndPercent = vm.currentMarket.Last * vm.autoData.coinPercent / 100;
                             // set currentTempCoint
                             switch (vm.currentTempCoinPrice) {
                                 case 1:
                                     vm.autoData.tempCoinPrice1 = vm.currentMarket.Last;
+                            		vm.autoData.coinAndPercent = vm.currentMarket.tempCoinPrice1 * vm.autoData.coinPercent / 100;
                                     break;
                                 case 2:
                                     vm.autoData.tempCoinPrice2 = vm.currentMarket.Last;
