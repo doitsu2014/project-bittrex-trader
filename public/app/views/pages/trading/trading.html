@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../../../../assets/css/trading.css">
+<link rel="stylesheet" href="../../../../assets/css/trade.css" />
 <h1 class="display-3">Trading Area USDT-</h1>
 <div class="col-md-2 ">
 </div>
@@ -54,14 +54,6 @@
             <div class="col-md-12">
                 <div class="col-md-8 trade-control">
                     <div class="col-md-6 form-group">
-                        <label for="autoCoinPriceTime">Update Coin Price Time: </label>
-                        <input id="autoCoinPriceTime" ng-init="trade.autoData.autoCoinPriceTime='00:00:00'" ng-model="trade.autoData.autoCoinPriceTime" placeholder="00:00:00" value="00:00:00" type="text" ng-disabled="trade.isConfirm" required>
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label for="autoCoinPriceTimeDelay">Delay: </label>
-                        <input id="autoCoinPriceTimeDelay" ng-model="trade.autoData.autoCoinPriceTimeDelay" placeholder="0s" type="text" place-holder="0s" disabled>
-                    </div>
-                    <div class="col-md-6 form-group">
                         <label for="autoBasePriceTime">Base Time: </label>
                         <input id="autoBasePriceTime" ng-init="trade.autoData.basePriceTime='00:00:00'" ng-model="trade.autoData.basePriceTime" placeholder="00:00:00" value="00:00:00" type="text" ng-disabled="trade.isConfirm" required>
                     </div>
@@ -76,6 +68,14 @@
                     <div class="col-md-6 form-group">
                         <label for="autoTradeTimeDelay">Delay: </label>
                         <input id="autoTradeTimeDelay" ng-model="trade.autoData.autoTradeTimeDelay" placeholder="0s" type="text" place-holder="0s" disabled>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="autoBaseMainTime">Base Main: </label>
+                        <input id="autoBaseMainTime" ng-init="trade.autoData.autoBaseMainTime='00:00:00'" ng-model="trade.autoData.autoBaseMainTime" placeholder="00:00:00" type="text" ng-disabled="trade.isConfirm" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="autoBaseMainTimeDelay">Delay: </label>
+                        <input id="autoBaseMainTimeDelay" ng-model="trade.autoData.autoBaseMainTimeDelay" placeholder="0s" type="text" place-holder="0s" disabled>
                     </div>
                     <div class="col-md-6 form-group">
                         <label for="autoAfterSellTime">After Sell Time: </label>
@@ -96,18 +96,6 @@
                 </div>
                 <div class="col-md-4 trade-control">
                     <div class="col-md-12 form-group">
-                        <label for="coinPercent">Coin Price Percent: </label>
-                        <input id="coinPercent" ng-init="trade.autoData.coinPercent=0" ng-model="trade.autoData.coinPercent" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0" required>
-                    </div>
-                    <div class="col-md-12 form-group">
-                        <label for="profitPercent">Profit Percent: </label>
-                        <input id="profitPercent" ng-init="trade.autoData.profitPercent=0" ng-model="trade.autoData.profitPercent" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0" required>
-                    </div>
-                    <div class="col-md-12 form-group">
-                        <label for="lossPercent">Loss Percent: </label>
-                        <input id="lossPercent" ng-init="trade.autoData.lossPercent=0" ng-model="trade.autoData.lossPercent" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0" required>
-                    </div>
-                    <div class="col-md-12 form-group">
                         <label for="autoTBuy">T-Buy: </label>
                         <input id="autoTBuy" ng-init="trade.autoData.autoTBuy=0" ng-model="trade.autoData.autoTBuy" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0" required>
                     </div>
@@ -115,30 +103,14 @@
                         <label for="autoTSell">T-Sell: </label>
                         <input id="autoTSell" ng-init="trade.autoData.autoTSell=0" ng-model="trade.autoData.autoTSell" type="number" ng-disabled="trade.isConfirm" step="any" max="0" placeholder="0" required>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="col-md-12">
-                    <div class="col-md-3 form-group">
-                        <label for="tempCoinPrice1">Temp Coin Price 1: </label>
-                        <input id="tempCoinPrice1" ng-model="trade.autoData.tempCoinPrice1" type="number" disabled step="any" min="0" placeholder="0" required>
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="tempCoinPrice2">Temp Coin Price 2: </label>
-                        <input id="tempCoinPrice2" ng-model="trade.autoData.tempCoinPrice2" type="number" disabled step="any" min="0" placeholder="0" required>
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="tempCoinPrice3">Temp Coin Price 3: </label>
-                        <input id="tempCoinPrice3" ng-model="trade.autoData.tempCoinPrice3" type="number" disabled step="any" min="0" placeholder="0" required>
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="coinAndPercent">Coin and percent: </label>
-                        <input id="coinAndPercent" ng-model="trade.autoData.coinAndPercent" type="number" disabled step="any" min="0" placeholder="0" required>
+                    <div class="col-md-12 form-group">
+                        <label for="autoTMain">T-Main: </label>
+                        <input id="autoTMain" ng-init="trade.autoData.autoTMain=0" ng-model="trade.autoData.autoTMain" type="number" ng-disabled="trade.isConfirm" step="any" min="0" placeholder="0" required>
                     </div>
                 </div>
             </div>
             <div class="col-md-12">
-                <div class="col-md-6 trade-control">
+                <div class="col-md-4 trade-control">
                     <div class="col-md-6 form-group">
                         <label for="autoPrice">Price Buy: </label>
                         <input id="autoPrice" ng-model="trade.autoData.autoPriceBid" type="number" disabled step="any" min="0" placeholder="0" required>
@@ -148,7 +120,17 @@
                         <input id="autoBasePrice" ng-model="trade.autoData.autoBasePriceBid" type="number" disabled step="any" min="0" placeholder="0" required>
                     </div>
                 </div>
-                <div class="col-md-6 trade-control">
+                <div class="col-md-4 trade-control">
+                	<div class="col-md-6 form-group">
+                        <label for="autoPriceMain">Price Main: </label>
+                        <input id="autoPriceMain" ng-model="trade.autoData.autoPriceMain" type="number" disabled step="any" min="0" placeholder="0" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="autoBasePriceMain">Base Price Main: </label>
+                        <input id="autoBasePriceMain" ng-model="trade.autoData.autoBasePriceMain" type="number" disabled step="any" min="0" placeholder="0" required>
+                    </div>
+                </div>
+                <div class="col-md-4 trade-control">
                     <div class="col-md-6 form-group">
                         <label for="autoPrice">Price Sell: </label>
                         <input id="autoPrice" ng-model="trade.autoData.autoPriceAsk" type="number" disabled step="any" min="0" placeholder="0" required>
@@ -157,8 +139,6 @@
                         <label for="autoBasePrice">Base Price Sell: </label>
                         <input id="autoBasePrice" ng-model="trade.autoData.autoBasePriceAsk" type="number" disabled step="any" min="0" placeholder="0" required>
                     </div>
-                </div>
-                <div class="col-md-6 trade-control">
                 </div>
             </div>
             <div class="col-md-12 trade-control">

@@ -71,7 +71,8 @@ angular.module('tradeCtrl', ['tradeService'])
                 vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
                 vm.autoData.autoBasePriceBid = vm.currentMarket.Bid;
                 vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;
-
+                vm.autoData.autoPriceMain = vm.currentMarket.Last;
+                vm.autoData.autoBasePriceMain = vm.currentMarket.Last;
                 // create success div if success confirm
                 vm.confirmMess += `Market Name: ${vm.currentMarket.MarketName}<br/>Limit ${limitCoin2}: ${vm.autoData.autoLimitCoin2}<br/>Price Bid: ${vm.autoData.autoPriceBid}<br/>Base Price Bid: ${vm.autoData.autoBasePriceBid}<br/>Price Ask: ${vm.autoData.autoPriceAsk}<br/>Base Price Ask: ${vm.autoData.autoBasePriceAsk}<br/>T-Buy ${vm.autoData.autoTBuy}<br/>T-Sell ${vm.autoData.autoTSell}`;
 
@@ -98,22 +99,19 @@ angular.module('tradeCtrl', ['tradeService'])
         };
 
         vm.startAutos = function() {
-            vm.isStartAutos = true;
-
+            vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
+            vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
+            vm.autoData.autoBaseMainTimeDelay = conTimeToTimeStamp(vm.autoData.autoBaseMainTime);
             vm.autoData.autoPriceBid = vm.currentMarket.Bid;
             vm.autoData.autoPriceAsk = vm.currentMarket.Ask;
             vm.autoData.autoBasePriceBid = vm.currentMarket.Bid;
             vm.autoData.autoBasePriceAsk = vm.currentMarket.Ask;
-
-            vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
+            vm.autoData.autoPriceMain = vm.currentMarket.Last;
+            vm.autoData.autoBasePriceMain = vm.currentMarket.Last;
+            vm.isStartAutos = true;
             autoBasePrice();
-            vm.autoData.autoTradeTimeDelay = conTimeToTimeStamp(vm.autoData.autoTradeTime);
+            autoDelayBaseMain();
             autoTrade();
-
-            vm.autoData.autoCoinPriceTimeDelay = conTimeToTimeStamp(vm.autoData.autoCoinPriceTime);
-            vm.autoData.coinAndPercent = vm.currentMarket.Last * vm.autoData.coinPercent / 100;
-            autoCoinPriceTool();
-
         };
 
         vm.tradeLog = "";
@@ -192,81 +190,62 @@ angular.module('tradeCtrl', ['tradeService'])
 
         var sellLimit = function() {
             var reqMarketName = vm.currentMarket.MarketName;
-            vm.getBalance()
-                .then((data) => {
-                    var reqQuantity = data.Available;
-                    TradeService.sellLimit2(reqMarketName, reqQuantity)
-                        .then(function(data) {
-                            try {
+            try {
+                vm.getBalance()
+                    .then((data) => {
+                        var reqQuantity = data.Available;
+                        TradeService.sellLimit2(reqMarketName, reqQuantity)
+                            .then(function(data) {
+                                try {
 
-                                // Delay buy after you sell and your balance must be not 0
-                                if (reqQuantity > 0) {
-                                    vm.autoData.autoTempBalance -= data.data.totalSuccess;
-                                    if (vm.autoData.autoTempBalance < 0) {
-                                        vm.autoData.autoTempBalance = 0;
+                                    // Delay buy after you sell and your balance must be not 0
+                                    if (reqQuantity > 0) {
+                                        vm.autoData.autoTempBalance -= data.data.totalSuccess;
+                                        if (vm.autoData.autoTempBalance < 0) {
+                                            vm.autoData.autoTempBalance = 0;
+                                        }
+                                        if (data.data.success) {
+                                            vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
+                                            vm.isDelayAfterSell = true;
+                                            autoDelayAfterSell();
+                                        }
+                                        vm.tradeLog += data.data.message;
                                     }
-                                    if (data.data.success) {
-                                        vm.autoData.autoAfterSellTimeDelay = conTimeToTimeStamp(vm.autoData.autoAfterSellTime);
-                                        vm.isDelayAfterSell = true;
-                                        autoDelayAfterSell();
-                                    }
-                                    vm.tradeLog += data.data.message;
+
+                                    $timeout(autoTrade, 1000);
+                                    return true;
+                                } catch (err) {
+                                    console.log(`TradeController-SellLimit: Error (${err})\n`);
+                                    $timeout(autoTrade, 1000);
+                                    return false;
                                 }
-
-                                $timeout(autoTrade, 1000);
-                                return true;
-                            } catch (err) {
+                            }).catch(function(err) {
                                 console.log(`TradeController-SellLimit: Error (${err})\n`);
                                 $timeout(autoTrade, 1000);
                                 return false;
-                            }
-                        }).catch(function(err) {
-                            console.log(`TradeController-SellLimit: Error (${err})\n`);
-                            $timeout(autoTrade, 1000);
-                            return false;
-                        });
-                });
+                            });
+                    });
+            } catch (ex) {
+                console.log(`TradeController-SellLimit: Error (${err})\n`);
+                $timeout(autoTrade, 1000);
+                return false;
+            }
         };
 
         // this function will return type of trade
         var checkConditions = function() {
-            try {
-                var x = vm.autoData.autoPriceBid - vm.autoData.autoBasePriceBid;
-                var y = vm.autoData.autoPriceAsk - vm.autoData.autoBasePriceAsk;
-
-                // Check buy variables
-                var tempX = vm.autoData.tempCoinPrice1;
-                var tempY = vm.autoData.tempCoinPrice2;
-                var tempZ = vm.autoData.tempCoinPrice3;
-                var coinAfterPercent = vm.autoData.coinAndPercent;
-
-                // Check sell variables
-                var askPriceAfterProfit = vm.autoData.askPriceAfterProfit;
-                var askPriceAfterLoss = vm.autoData.askPriceAfterLoss;
-                var lastPrice = vm.currentMarket.Last;
-
-                if (y < 0) {
-                    if (tempX < tempY < tempZ && tempZ - tempX > coinAfterPercent) {
-                        if (y <= vm.autoData.autoTSell) {
-                            return Constants.TypeOfTrade.sell;
-                        }
-                    } else if (tempX > lastPrice + (tempX*vm.autoData.lossPercent / 100)) {
-                        return Constants.TypeOfTrade.sell;
-                    } else {
-                        return Constants.TypeOfTrade.doNothing;
-                    }
-
-                } else if (x > 0) {
-                    if (tempX > tempY > tempZ && tempX - tempZ > coinAfterPercent) {
-                        if (x > vm.autoData.autoTBuy) {
-                            return Constants.TypeOfTrade.buy;
-                        }
-                    }
-                } else {
-                    return Constants.TypeOfTrade.doNothing;
+            var x = vm.autoData.autoPriceBid - vm.autoData.autoBasePriceBid;
+            var y = vm.autoData.autoPriceAsk - vm.autoData.autoBasePriceAsk;
+            var z = vm.autoData.autoPriceMain - vm.autoData.autoBasePriceMain;
+            if (y < 0) {
+                if (y <= vm.autoData.autoTSell) {
+                    return Constants.TypeOfTrade.sell;
                 }
-            } catch (err) {
-                console.log(`tradeController--checkConditions: Err${err.message}`)
+            } else if (x > 0 && z < vm.autoData.autoTMain) {
+                if (x > vm.autoData.autoTBuy) {
+                    return Constants.TypeOfTrade.buy;
+                }
+            } else {
                 return Constants.TypeOfTrade.doNothing;
             }
         };
@@ -288,7 +267,7 @@ angular.module('tradeCtrl', ['tradeService'])
                         }
                         $timeout(autoBasePrice, 1000);
                     } catch (err) {
-                        console.log(`TradeController-AutoBasePrice: ${err.message}\n`);
+                        console.log(`TradeController-AutoBasePrice: ${err}\n`);
                         vm.autoData.basePriceTimeDelay -= 1;
                         vm.autoData.basePriceTimeDelay = conTimeToTimeStamp(vm.autoData.basePriceTime);
                         $timeout(autoBasePrice, 1000);
@@ -297,41 +276,29 @@ angular.module('tradeCtrl', ['tradeService'])
             }
         };
 
-        vm.currentTempCoinPrice = 1;
-        var autoCoinPriceTool = () => {
+        var autoDelayBaseMain = () => {
             if (vm.isConfirm) {
                 if (vm.isStartAutos) {
                     try {
-                        if (vm.autoData.autoCoinPriceTimeDelay > 0) {
-                            vm.autoData.autoCoinPriceTimeDelay -= 1;
+                        if (vm.autoData.autoBaseMainTimeDelay > 0) {
+                            vm.autoData.autoPriceMain = vm.currentMarket.Last;
+                            vm.autoData.autoBaseMainTimeDelay -= 1;
                         } else {
-                            // set currentTempCoint
-                            switch (vm.currentTempCoinPrice) {
-                                case 1:
-                                    vm.autoData.tempCoinPrice1 = vm.currentMarket.Last;
-                            		vm.autoData.coinAndPercent = vm.currentMarket.tempCoinPrice1 * vm.autoData.coinPercent / 100;
-                                    break;
-                                case 2:
-                                    vm.autoData.tempCoinPrice2 = vm.currentMarket.Last;
-                                    break;
-                                case 3:
-                                    vm.autoData.tempCoinPrice3 = vm.currentMarket.Last;
-                                    break;
-                            }
-                            vm.currentTempCoinPrice = vm.currentTempCoinPrice < 3 ? vm.currentTempCoinPrice + 1 : 1;
-                            vm.autoData.autoCoinPriceTimeDelay = conTimeToTimeStamp(vm.autoData.autoCoinPriceTime);
+                            vm.autoData.autoPriceMain = vm.currentMarket.Last;
+                            vm.autoData.autoBasePriceMain = vm.currentMarket.Last;
+                            vm.autoData.autoBaseMainTimeDelay = conTimeToTimeStamp(vm.autoData.autoBaseMainTime);
                         }
-                        $timeout(autoCoinPriceTool, 1000);
+                        $timeout(autoDelayBaseMain, 1000);
                     } catch (err) {
-                        console.log(`TradeController-AutoBasePrice: ${err.message}\n`);
-                        vm.autoData.autoCoinPriceTimeDelay -= 1;
-                        vm.autoData.autoCoinPriceTimeDelay = conTimeToTimeStamp(vm.autoData.autoCoinPriceTime);
-                        vm.currentTempCoinPrice = vm.currentTempCoinPrice < 3 ? vm.currentTempCoinPrice + 1 : 1;
-                        $timeout(autoCoinPriceTool, 1000);
+                        console.log(`TradeController-AutoDelayBaseMain: ${err}\n`);
+                        vm.autoData.autoBaseMainTimeDelay -= 1;
+                        vm.autoData.autoBaseMainTimeDelay = conTimeToTimeStamp(vm.autoData.autoBaseMainTime);
+                        $timeout(autoDelayBaseMain, 1000);
                     }
                 }
             }
         };
+
 
         vm.isDelayAfterSell = false;
         var autoDelayAfterSell = () => {
@@ -345,7 +312,7 @@ angular.module('tradeCtrl', ['tradeService'])
                             vm.isDelayAfterSell = false;
                         }
                     } catch (err) {
-                        console.log(`TradeController-AutoDelayAfterSell: ${err.message}\n`);
+                        console.log(`TradeController-AutoDelayAfterSell: ${err}\n`);
                         vm.autoData.autoAfterSellTimeDelay = 0;
                         vm.isDelayAfterSell = false;
                         $timeout(autoDelayAfterSell, 1000);
@@ -353,6 +320,8 @@ angular.module('tradeCtrl', ['tradeService'])
                 }
             }
         };
+
+
 
         vm.isDelayAfterBuy = false;
         var autoDelayAfterBuy = () => {
@@ -366,7 +335,7 @@ angular.module('tradeCtrl', ['tradeService'])
                             vm.isDelayAfterBuy = false;
                         }
                     } catch (err) {
-                        console.log(`TradeController-AutoDelayAfterBuy: ${err.message}\n`);
+                        console.log(`TradeController-AutoDelayAfterBuy: ${err}\n`);
                         vm.autoData.autoAfterBuyTimeDelay = 0;
                         vm.isDelayAfterBuy = false;
                         $timeout(autoDelayAfterBuy, 1000);
@@ -389,6 +358,9 @@ angular.module('tradeCtrl', ['tradeService'])
             result += basePriceTimeRegExp.test(vm.autoData.autoAfterSellTime) ? "" : "After Sell Delay is not valid<br/>";
             result += basePriceTimeRegExp.test(vm.autoData.autoAfterBuyTime) ? "" : "After Buy Delay is not valid<br/>";
             result += basePriceTimeRegExp.test(vm.autoData.basePriceTime) ? "" : "Base Price Time is not valid<br/>";
+            result += basePriceTimeRegExp.test(vm.autoData.autoBaseMainTime) ? "" : "Base Main Time is not valid<br/>";
+
+
             result += tradeTimeRegExp.test(vm.autoData.autoTradeTime) ? "" : "Trade Time is not valid<br/>";
             result += Number.parseFloat(vm.autoData.autoTBuy) != 0 ? "" : "T-Buy should not 0<br/>";
             result += Number.parseFloat(vm.autoData.autoTSell) != 0 ? "" : "T-Sell should not 0<br/>";
@@ -403,7 +375,7 @@ angular.module('tradeCtrl', ['tradeService'])
                 var result = parseInt(elements[0] * 3600) + parseInt(elements[1] * 60) + parseInt(elements[2]);
                 return result;
             } catch (err) {
-                console.log(`TradeController-conTimeToTimeStamp: ${err.message}`);
+                console.log(`TradeController-conTimeToTimeStamp: ${err}`);
                 return 5;
             }
         };
