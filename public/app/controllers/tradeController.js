@@ -241,7 +241,7 @@ angular.module('tradeCtrl', ['tradeService'])
                 if (y <= vm.autoData.autoTSell) {
                     return Constants.TypeOfTrade.sell;
                 }
-            } else if (x > 0 && z < 0) {
+            } else if (x > 0 && z < vm.autoData.autoTMain) {
                 if (x > vm.autoData.autoTBuy) {
                     return Constants.TypeOfTrade.buy;
                 }
