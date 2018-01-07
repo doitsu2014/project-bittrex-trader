@@ -22,6 +22,8 @@
 	<script src="app/services/homeService.js"></script>
 	<script src="app/controllers/tradeController.js"></script>
 	<script src="app/services/tradeService.js"></script>
+	<script src="app/controllers/tradeVer2Controller.js"></script>
+	<script src="app/services/tradeVer2Service.js"></script>
 	<script src="app/controllers/mainController.js"></script>
 	<script src="app/services/authService.js"></script>
 	<script src="app/app.router.js"></script>
@@ -97,6 +99,7 @@
 				<ul class="nav navbar-nav">
 					<li><a href="/">Home</a></li>
 					<li ng-if="main.user"><a href="/trading">Trade Area</a></li>
+					<li ng-if="main.user"><a href="/trading-ver2">Trade Ver 2 Area</a></li>
 					<li class="cd-popup-trigger cd-aboutme-popup-trigger"><a href="#" >Guide</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">

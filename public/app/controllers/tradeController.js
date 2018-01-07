@@ -11,17 +11,17 @@ angular.module('tradeCtrl', ['tradeService'])
         var tradeUrl = $location.path();
 
         (() => {
-            TradeService.getBalance("USDT");
+            TradeService.getBalance("BTC");
         })();
 
-        TradeService.getMarkets(vm.marketType || 'USDT-')
+        TradeService.getMarkets(vm.marketType || 'BTC-')
             .then(function(data) {
                 vm.Markets = data;
                 return data;
             });
 
         vm.getMarket = function() {
-            TradeService.getMarket(vm.marketName || 'USDT-BTC')
+            TradeService.getMarket(vm.marketName || 'BTC-ETH')
                 .then(function(data) {
                     try {
                         vm.currentMarket = data ? data[0] : null;
@@ -44,7 +44,6 @@ angular.module('tradeCtrl', ['tradeService'])
         vm.getBalance = () => {
             // get balance for sell method so you need the name of the left side
             var reqCurrency = vm.currentMarket ? vm.currentMarket.MarketName.split('-')[1] : "BTC";
-
 
             return $q((resolve, reject) => {
                 TradeService.getBalance(reqCurrency)

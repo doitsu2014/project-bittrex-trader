@@ -7,6 +7,7 @@ angular.module('userApp', [
     'homeCtrl',
     'tradeService',
     'tradeCtrl',
+    'tradeVer2Ctrl',
     'app.routes'
   ])
   .config(function ($httpProvider) {
