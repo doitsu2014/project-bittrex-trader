@@ -45,7 +45,7 @@
                     </div>
                     <div class="form-group">
                         <label for="IdealPercent" class="control-label">Ideal Percent</label>
-                        <input type="text" class="" id="IdealPercent"
+                        <input type="number" min="0" max="100" class="" id="IdealPercent"
                         ng-init="IdealPercent=0"
                         ng-disabled="IsStartTool"
                         ng-model="IdealPercent">
@@ -60,7 +60,7 @@
             </div>
         </form>
     </div>
-    <div class="col-md-6 table-responsive">
+    <div class="col-md-9 table-responsive">
         <h3 class="text-center">First Coin Hash Map</h3>
         <table class="table table-striped" id="FirstCoinsTable" >
             <thead>
@@ -70,7 +70,7 @@
                     <th>Is Bought</th>
                     <th>Total Bought</th>
                     <th>Buy Time</th>
-                    <th>Sell Price</th>
+                    <th>Total Sell</th>
                     <th>Count</th>
                 </tr>
             </thead>
@@ -88,23 +88,19 @@
                    <td>{{ firstCoin.IsBought }}</td>
                    <td>{{ firstCoin.TotalBought }}</td>
                    <td>{{ firstCoin.BuyTime }}</td>
-                   <td>{{ firstCoin.SellPrice }}</td>
+                   <td>{{ firstCoin.TotalSell }}</td>
                    <td>{{ firstCoin.Count }}</td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-3">
         <h3 class="text-center">Second Coin Hash Map</h3>
         <table class="table table-striped table-responsive" id="SecondCoinsTable">
             <thead>
                 <tr>
                     <th>Coin name</th>
                     <th>% Change</th>
-                    <th>Is Bought</th>
-                    <th>Total Bought</th>
-                    <th>Buy Time</th>
-                    <th>Sell Price</th>
                     <th>Count</th>
                 </tr>
             </thead>
@@ -119,10 +115,6 @@
                                 {{ secondCoin.PercentChange.toFixed(1) }} %
                             </p> 
                         </td>
-                        <td>{{ secondCoin.IsBought }}</td>
-                        <td>{{ secondCoin.TotalBought }}</td>
-                        <td>{{ secondCoin.BuyTime }}</td>
-                        <td>{{ secondCoin.SellPrice }}</td>
                         <td>{{ secondCoin.Count }}</td>
                     </tr>
             </tbody>

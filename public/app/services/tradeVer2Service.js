@@ -64,6 +64,7 @@ angular.module('tradeVer2Service', [])
 					reqProfitPercent: reqProfitPercent,
 				})
 				.then(function (response) {
+					console.log('Trade Service Sell Limit 2: ', response);
 					return response;
 				})
 				.catch(error => {console.log(`Trade Service-sellLimit-ERROR:`); console.log(error)});
@@ -76,9 +77,10 @@ angular.module('tradeVer2Service', [])
 					reqCurrency: reqCurrency
 				})
 				.then(function (response) {
+					console.log(response);
 					return response;
 				})
-				.catch(error => {console.log(`Trade Service-Get Order-ERROR:`); console.log(error)});
+				.catch(error => {console.log(`Trade Service-Get Order-ERROR:`); console.log()});
 		};
 
 		tradeFactory.getOrdersBook = function (reqMarketName, reqType) {

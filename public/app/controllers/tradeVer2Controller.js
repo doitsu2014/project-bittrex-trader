@@ -16,7 +16,7 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
             this.TotalBought = null;
             this.IsBought = null;
             this.BuyTime = null;
-            this.SellPrice = null;
+            this.TotalSell = null;
             this.Count;
             
             this.Init = function (obj, count) {
@@ -103,7 +103,6 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
                             let amount = $scope.BuyAmount;
                             buyLimit(f[market], amount);
                             // sellLimit(f[market].Name, $scope.ProfitPercent);
-                            
                         }
                     } else {
                         let amount = $scope.BuyAmount;
@@ -121,14 +120,12 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
                 .then(function(data) {
                     try {
                         if(data.data.success) {
-                            CurCoin.TotalBought = data.data.TotalSuccess;
+                            CurCoin.TotalBought = data.data.totalSuccess;
                             CurCoin.IsBought = true;
                             CurCoin.BuyTime = new Date();
-                            CurCoin.SellPrice = 0;
+                            CurCoin.TotalSell = 0;
                             sellLimit(CurCoin, $scope.ProfitPercent);
                             return true;
-                        } else {
-                            return false;
                         }
                     } catch (err) {
                         console.log(`TradeController-BuyLimit: Error (${err})\n`);
@@ -144,15 +141,16 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
             try {
                 getBalance(CurCoin.Name)
                     .then((data) => {
-                        if(data.success) {
-                            var reqQuantity = data.Balance.Available;
+                        console.log(data);
+                        if(data.balance) {
+                            var reqQuantity = data.balance.Available ? data.balance.Available : 0;
                             service.sellLimit2(CurCoin.Name, reqQuantity, ProfitPercent)
                                 .then(function(data) {
                                     try {
                                         // Delay buy after you sell and your balance must be not 0
                                         console.log(data);
                                         if(data.data.success) {
-                                            CurCoin.SellPrice = data.data.TotalSuccess;
+                                            CurCoin.TotalSell = data.data.totalSuccess;
                                         }
                                         return true;
                                     } catch (err) {
@@ -186,19 +184,25 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
             return prevDay ? (last - prevDay) / prevDay * 100 : 0;
         };
         let sortMarketList = (markets) => {
-            let sortedMarkets = Object.keys(markets).sort((a,b) => {
-                let aPercent = CalcPercentChange(markets[a].PrevDay,markets[a].Last);
-                let bPercent = CalcPercentChange(markets[b].PrevDay,markets[b].Last);
-                return aPercent < bPercent ? 1 : aPercent > bPercent ? -1 : 0;
-            }).filter((key, index) => {return index < 20});
-
-            let result = [];
-            markets.forEach((ele, index) => {
-                if(sortedMarkets.find((ele)=>{return ele == index;})) {
-                    result.push(ele);
-                }
-            });
-            return result;
+            try {
+                let sortedMarkets = Object.keys(markets).sort((a,b) => {
+                    let aPercent = CalcPercentChange(markets[a].PrevDay,markets[a].Last);
+                    let bPercent = CalcPercentChange(markets[b].PrevDay,markets[b].Last);
+                    return aPercent < bPercent ? 1 : aPercent > bPercent ? -1 : 0;
+                }).filter((key, index) => {return index < 20});
+    
+                let result = [];
+                markets.forEach((ele, index) => {
+                    if(sortedMarkets.find((ele)=>{return ele == index;})) {
+                        result.push(ele);
+                    }
+                });
+                return result;
+            } catch (e) {
+                console.log('sortMarketList - Error: ', e);
+                return [];
+            }
+            
         };
         let ConTimeToTimeStamp = (basicTime) => {
             try {
@@ -219,45 +223,52 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
         $scope.FirstHashCoinsUpdate = async function (count) {
             let markets = await $scope.GetMarkets('BTC');
             let sortedList = sortMarketList(markets);
-            
-            if(!$scope.FirstHashCoins) {
-                $scope.FirstHashCoins = {}; 
-                sortedList.forEach((ele, index) => {
-                    let coin = new Coin();
-                    coin.Init(ele);
-                    $scope.FirstHashCoins[coin.Name] = coin;
-                });
-                return {message:"New first hash coins, OK", success: true};
+            if(sortedList.length > 0) {
+                if(!$scope.FirstHashCoins) {
+                    $scope.FirstHashCoins = {}; 
+                    sortedList.forEach((ele, index) => {
+                        let coin = new Coin();
+                        coin.Init(ele);
+                        $scope.FirstHashCoins[coin.Name] = coin;
+                    });
+                    return {message:"New first hash coins, OK", success: true};
+                } else {
+                    sortedList.forEach((ele, index) => {
+                        let curCoin = $scope.FirstHashCoins[ele.MarketName];
+                        if(curCoin) {
+                            curCoin.Init(ele, curCoin.Count+1);
+                        }
+                    });
+                    return {message:"Update first hash coins, OK", success: true};
+                }
             } else {
-                sortedList.forEach((ele, index) => {
-                    let curCoin = $scope.FirstHashCoins[ele.MarketName];
-                    if(curCoin) {
-                        curCoin.Init(ele, curCoin.Count+1);
-                    }
-                });
-                return {message:"Update first hash coins, OK", success: true};
+                console.log('First Hash Coins Update Error: sortedList is empty');
             }
         };
         $scope.SecondHashCoinsUpdate = async function (count) {
             let markets = await $scope.GetMarkets('BTC');
             let sortedList = sortMarketList(markets);
-
-            if(!$scope.SecondHashCoins) {
-                $scope.SecondHashCoins = {}; 
-                sortedList.forEach((ele, index) => {
-                    let coin = new Coin();
-                    coin.Init(ele);
-                    $scope.SecondHashCoins[coin.Name] = coin;
-                });
-                return {message:"New second hash coins, OK", success: true};
+            if(sortedList.length > 0) {
+                if(!$scope.SecondHashCoins) {
+                    $scope.SecondHashCoins = {}; 
+                    sortedList.forEach((ele, index) => {
+                        let coin = new Coin();
+                        coin.Init(ele);
+                        $scope.SecondHashCoins[coin.Name] = coin;
+                    });
+                    return {message:"New second hash coins, OK", success: true};
+                } else {
+                    sortedList.forEach((ele, index) => {
+                        let curCoin = $scope.SecondHashCoins[ele.MarketName];
+                        if(curCoin) {
+                            curCoin.Init(ele, curCoin.Count+1);
+                        }
+                    });
+                    return {message:"Update second hash coins, OK", success: true};
+                }
             } else {
-                sortedList.forEach((ele, index) => {
-                    let curCoin = $scope.SecondHashCoins[ele.MarketName];
-                    if(curCoin) {
-                        curCoin.Init(ele, curCoin.Count+1);
-                    }
-                });
-                return {message:"Update second hash coins, OK", success: true};
+                console.log('Second Hash Coins Update Update Error: sortedList is empty');
+                
             }
         };
         $scope.stopIntervals = () => {
