@@ -101,12 +101,14 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
                         let curTS = ((new Date()-new Date(f[market].BuyTime))/1000);
                         if(curTS >= $scope.TimeDelayCountDown) {
                             let amount = $scope.BuyAmount;
-                            sellLimit(f[market].Name, $scope.ProfitPercent);
+                            buyLimit(f[market], amount);
+                            // sellLimit(f[market].Name, $scope.ProfitPercent);
                             
                         }
                     } else {
                         let amount = $scope.BuyAmount;
-                        sellLimit(f[market].Name, $scope.ProfitPercent);
+                        buyLimit(f[market], amount);
+                        // sellLimit(f[market].Name, $scope.ProfitPercent);
                     }
                 } else {
                     // Don't buy
@@ -123,7 +125,7 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
                             CurCoin.IsBought = true;
                             CurCoin.BuyTime = new Date();
                             CurCoin.SellPrice = 0;
-                            sellLimit(CurCoin.Name, $scope());
+                            sellLimit(CurCoin, $scope.ProfitPercent);
                             return true;
                         } else {
                             return false;
@@ -138,17 +140,20 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
                 });
         };
 
-        var sellLimit = function(MarketName, ProfitPercent) {
+        var sellLimit = function(CurCoin, ProfitPercent) {
             try {
-                getBalance(MarketName)
+                getBalance(CurCoin.Name)
                     .then((data) => {
                         if(data.success) {
                             var reqQuantity = data.Balance.Available;
-                            service.sellLimit2(MarketName, reqQuantity, ProfitPercent)
+                            service.sellLimit2(CurCoin.Name, reqQuantity, ProfitPercent)
                                 .then(function(data) {
                                     try {
                                         // Delay buy after you sell and your balance must be not 0
                                         console.log(data);
+                                        if(data.data.success) {
+                                            CurCoin.SellPrice = data.data.TotalSuccess;
+                                        }
                                         return true;
                                     } catch (err) {
                                         console.log(`TradeController-SellLimit: Error (${err})\n`);
