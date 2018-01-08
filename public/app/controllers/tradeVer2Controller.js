@@ -55,14 +55,15 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
             this._SetIntervals = function () {
                 // refresh intervals before set
                 this._ClearIntervals();
-                this.ToolAuto = setInterval(() => {
+                this.ToolAuto = setInterval(async () => {
                     if ($scope.IsStartTool) {
                         try {
                             if($scope.TimeCheckCountDown > 0) {
                                 $scope.TimeCheckCountDown -= 1;                                
                                 $scope.SecondHashCoinsUpdate();
                             } else {
-                                let BuyList = CheckAndBuy();
+                                let BuyList = await CheckAndBuy();
+                                console.log('Check and buy result: ', BuyList);
                                 $scope.FirstHashCoinsUpdate();
                                 $scope.TimeCheckCountDown = ConTimeToTimeStamp($scope.TimeCheck);
                             }
@@ -75,7 +76,6 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
             };
         };
         $scope.MyIntervals = new Intervals();
-        
 
         // Services
         const service = TradeVer2Service;
@@ -101,30 +101,38 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
                         let curTS = ((new Date()-new Date(f[market].BuyTime))/1000);
                         if(curTS >= $scope.TimeDelayCountDown) {
                             let amount = $scope.BuyAmount;
-                            buyLimit(f[market], amount);
+                            var buyRs = await buyLimit(f[market], amount);
+                            console.log(`Buy ${f[market].Name} rs: `, buyRs);
                             // sellLimit(f[market].Name, $scope.ProfitPercent);
+                            return true;
                         }
                     } else {
                         let amount = $scope.BuyAmount;
-                        buyLimit(f[market], amount);
+                        var buyRs = await buyLimit(f[market], amount);
+                        console.log(`Buy ${f[market].Name} rs: `, buyRs);
                         // sellLimit(f[market].Name, $scope.ProfitPercent);
+                        return true;
                     }
                 } else {
                     // Don't buy
+                    return false;
                 }
             }
             return {result: false, message: "Check fail!"};
         };
-        var buyLimit = function(CurCoin, Quantity) {
+
+        var buyLimit = async function(CurCoin, Quantity) {
             service.buyLimit2(CurCoin.Name, Quantity)
                 .then(function(data) {
                     try {
+                        console.log('Buy Limit Data: ', data);
                         if(data.data.success) {
                             CurCoin.TotalBought = data.data.totalSuccess;
                             CurCoin.IsBought = true;
                             CurCoin.BuyTime = new Date();
                             CurCoin.TotalSell = 0;
-                            sellLimit(CurCoin, $scope.ProfitPercent);
+                            let sellRs = await sellLimit(CurCoin, $scope.ProfitPercent);
+                            console.log(`Sell ${CurCoin.Name} result: `, sellRs);
                             return true;
                         }
                     } catch (err) {
@@ -141,14 +149,14 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
             try {
                 getBalance(CurCoin.Name)
                     .then((data) => {
-                        console.log(data);
+                        console.log('Get Balance Data: ',data);
                         if(data.balance) {
                             var reqQuantity = data.balance.Available ? data.balance.Available : 0;
                             service.sellLimit2(CurCoin.Name, reqQuantity, ProfitPercent)
                                 .then(function(data) {
                                     try {
                                         // Delay buy after you sell and your balance must be not 0
-                                        console.log(data);
+                                        console.log('Sell LImit Data: ', data);
                                         if(data.data.success) {
                                             CurCoin.TotalSell = data.data.totalSuccess;
                                         }
@@ -216,8 +224,8 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
         };
 
         // Main Functions
-        $scope.GetMarkets = function (coinName) {
-            let markets = service.getMarkets(coinName);
+        $scope.GetMarkets = async function (coinName) {
+            let markets = await service.getMarkets(coinName);
             return markets;
         };
         $scope.FirstHashCoinsUpdate = async function (count) {
