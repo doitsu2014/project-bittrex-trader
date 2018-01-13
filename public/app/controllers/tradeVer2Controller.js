@@ -1,3 +1,4 @@
+'use-strict';
 angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
     .constant('Constants', {
         TypeOfTrade: {
@@ -52,7 +53,7 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
                 clearInterval(this.ToolAuto);
             };
             
-            this._SetIntervals = function () {
+            this._SetIntervals = async function () {
                 // refresh intervals before set
                 this._ClearIntervals();
                 this.ToolAuto = setInterval(async () => {
@@ -79,7 +80,7 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
 
         // Services
         const service = TradeVer2Service;
-        const CheckAndBuy = function () {
+        const CheckAndBuy = async function () {
             let f = $scope.FirstHashCoins;
             let s = $scope.SecondHashCoins;
             for (let market in f) {
@@ -123,7 +124,7 @@ angular.module('tradeVer2Ctrl', ['tradeVer2Service'])
 
         var buyLimit = async function(CurCoin, Quantity) {
             service.buyLimit2(CurCoin.Name, Quantity)
-                .then(function(data) {
+                .then(async function(data) {
                     try {
                         console.log('Buy Limit Data: ', data);
                         if(data.data.success) {

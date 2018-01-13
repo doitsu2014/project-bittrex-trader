@@ -156,14 +156,14 @@ module.exports = function (app, express) {
 				// orders book here
 				var ordersBook = data.result.slice(0, 100);
 				var baseQuantity = Number.parseFloat(reqQuantity);
-				if (baseQuantity <= 0) {
-					return res.json({
-						success: false,
-						message: "You buy 0 so you buy nothing\n",
-						totalSuccess: 0,
-						totalFail: 0
-					});
-				}
+				// if (baseQuantity <= 0) {
+				// 	return res.json({
+				// 		success: false,
+				// 		message: "You buy 0 so you buy nothing\n",
+				// 		totalSuccess: 0,
+				// 		totalFail: 0
+				// 	});
+				// }
 				var resultMes = "";
 				var totalSuccess = 0;
 				var totalFail = 0;
@@ -249,6 +249,13 @@ module.exports = function (app, express) {
 									}
 								});
 							}
+						} else {
+							return res.json({
+								success: false,
+								message: "You buy 0 so you buy nothing\n",
+								totalSuccess: 0,
+								totalFail: 0
+							});
 						}
 					}, function (err) {
 
@@ -286,19 +293,19 @@ module.exports = function (app, express) {
 				// orders book here
 				var ordersBook = data.result.slice(0, 100);
 				var baseQuantity = Number.parseFloat(reqQuantity);
-				if (baseQuantity <= 0) {
-					return res.json({
-						success: false,
-						message: "Your SELL balance is insufficiency\n",
-						totalSuccess: 0,
-						totalFail: 0
-					});
-				}
+				// if (baseQuantity <= 0) {
+				// 	return res.json({
+				// 		success: false,
+				// 		message: "Your SELL balance is insufficiency\n",
+				// 		totalSuccess: 0,
+				// 		totalFail: 0
+				// 	});
+				// }
 				var resultMes = "";
 				var totalSuccess = 0;
 				var totalFail = 0;
 				try {
-					var orderBook = ordersBook.length ? orderBook[0] : null;
+					var orderBook = ordersBook.length ? ordersBook[0] : null;
 					if(orderBook) {
 						bittrex.selllimit({
 							market: reqMarketName,
@@ -306,7 +313,7 @@ module.exports = function (app, express) {
 							rate: orderBook.Rate * (100 + reqProfitPercent) / 100
 						}, function (data, err) {
 							if (err) {
-								resultMes += `Sell: Quantity_${baseQuantity} --- Rate_${item.Rate} --- Message_${err.message}\n`;
+								resultMes += `Sell: Quantity_${baseQuantity} --- Rate_${orderBook.Rate} --- Message_${err.message}\n`;
 								return res.json({
 									success: false,
 									message: resultMes,
@@ -314,7 +321,7 @@ module.exports = function (app, express) {
 									totalFail: 0
 								});
 							} else {
-								resultMes += `Sell: Quantity_${baseQuantity} --- Rate_${item.Rate} --- Message_Success\n`;
+								resultMes += `Sell: Quantity_${baseQuantity} --- Rate_${orderBook.Rate} --- Message_Success\n`;
 								return res.json({
 									success: true,
 									message: resultMes,
@@ -352,6 +359,8 @@ module.exports = function (app, express) {
 					});
 				}
 				return res.json({
+					success: true,
+					message: `Your ${reqCurrency} balance is back`,
 					balance: data.result
 				});
 			});
