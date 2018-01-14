@@ -1,0 +1,19 @@
+{
+    "success": true,
+    "message": "",
+    "result": [{
+        "MarketName": "BTC-SC",
+        "High": 0.00000637,
+        "Low": 0.00000263,
+        "Volume": 6069571473.64986864,
+        "Last": 0.00000531,
+        "BaseVolume": 25616.73484997,
+        "TimeStamp": "2018-01-06T04:15:56.48",
+        "Bid": 0.00000530,
+        "Ask": 0.00000531,
+        "OpenBuyOrders": 8339,
+        "OpenSellOrders": 10303,
+        "PrevDay": 0.00000281,
+        "Created": "2017-05-22T21:30:29.16"
+    }]
+}

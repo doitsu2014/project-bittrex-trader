@@ -16,6 +16,11 @@ angular.module('app.routes', ['ngRoute'])
         controller: 'TradeController',
         controllerAs: 'trade'
       })
+      .when('/trading-ver2', {
+        templateUrl: 'app/views/pages/trading/trading-ver-2.html',
+        controller: 'TradeVer2Controller',
+        controllerAs: 'trade'
+      }) 
 
     $locationProvider.html5Mode(true);
   });
