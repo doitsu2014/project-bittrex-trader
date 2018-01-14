@@ -11,17 +11,17 @@ angular.module('tradeCtrl', ['tradeService'])
         var tradeUrl = $location.path();
 
         (() => {
-            TradeService.getBalance("USDT");
+            TradeService.getBalance("BTC");
         })();
 
-        TradeService.getMarkets(vm.marketType || 'USDT-')
+        TradeService.getMarkets(vm.marketType || 'BTC-')
             .then(function(data) {
                 vm.Markets = data;
                 return data;
             });
 
         vm.getMarket = function() {
-            TradeService.getMarket(vm.marketName || 'USDT-BTC')
+            TradeService.getMarket(vm.marketName || 'BTC-1ST')
                 .then(function(data) {
                     try {
                         vm.currentMarket = data ? data[0] : null;
@@ -61,7 +61,7 @@ angular.module('tradeCtrl', ['tradeService'])
         vm.setupAutoTrade = function() {
             vm.dangerFormAuto = validateFormAuto();
             if (!vm.dangerFormAuto) {
-                var limitCoin2 = vm.currentMarket ? vm.currentMarket.MarketName.split('-')[0] : "USDT";
+                var limitCoin2 = vm.currentMarket ? vm.currentMarket.MarketName.split('-')[0] : "BTC";
 
                 // remove danger div if success confirm
                 vm.dangerFormAuto = null;
@@ -345,7 +345,7 @@ angular.module('tradeCtrl', ['tradeService'])
         };
 
         var serviceGetMarket = () => {
-            TradeService.getMarket(vm.marketName || 'USDT-BTC')
+            TradeService.getMarket(vm.marketName || 'BTC-1ST')
                 .then(function(data) {
                     vm.currentMarket = data ? data[0] : null;
                 });

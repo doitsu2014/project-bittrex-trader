@@ -34,7 +34,7 @@
                 <div class="col-md-8 trade-control">
                     <div class="col-md-12 form-group">
                         <label for="ddlMarketName">Select your market: </label>
-                        <select id="ddlMarketName" class="" ng-init="trade.marketName='USDT-BTC'" ng-model="trade.marketName" ng-disabled="trade.isConfirm" required="required">
+                        <select id="ddlMarketName" class="" ng-init="trade.marketName='BTC-1ST'" ng-model="trade.marketName" ng-disabled="trade.isConfirm" required="required">
                             <option value="{{trade.marketName}}">{{trade.marketName}}</option>
                             <option ng-repeat="market in trade.Markets" value="{{market.MarketName}}">{{market.MarketName}}</option>
                         </select>
